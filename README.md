@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaRL Department | Admin Email Approval | Working Admin Login</title>
+    <title>TaRL Department | Working Admin Login | mohammedscho2023@gmail.com</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -50,14 +50,12 @@
         .alert { padding: 10px 14px; border-radius: 10px; margin-bottom: 15px; font-size: 0.75rem; }
         .alert-info { background: #dbeafe; color: #1e40af; border-left: 4px solid #2563eb; }
         .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
-        .alert-warning { background: #fed7aa; color: #92400e; border-left: 4px solid #f59e0b; }
         .level-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
         .level-1 { background: #fee2e2; color: #991b1b; }
         .level-2 { background: #fed7aa; color: #9a3412; }
         .level-3 { background: #fef3c7; color: #92400e; }
         .level-4 { background: #d1fae5; color: #065f46; }
         .level-5 { background: #dbeafe; color: #1e40af; }
-        .level-6 { background: #e0e7ff; color: #3730a3; }
         .footer { text-align: center; padding: 20px; color: rgba(255,255,255,0.5); font-size: 0.7rem; }
         .login-container { max-width: 500px; margin: 50px auto; }
         .role-selector { display: flex; gap: 10px; margin-bottom: 20px; }
@@ -65,11 +63,11 @@
         .role-btn.active { border-color: #2563eb; background: #dbeafe; color: #2563eb; }
         .user-info { display: flex; align-items: center; gap: 15px; background: #f1f5f9; padding: 8px 18px; border-radius: 40px; }
         .user-avatar { width: 35px; height: 35px; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
-        .email-sim { background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 12px; font-family: monospace; font-size: 0.7rem; margin-top: 15px; text-align: left; white-space: pre-wrap; word-break: break-all; }
+        .email-sim { background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 12px; font-family: monospace; font-size: 0.7rem; margin-top: 15px; text-align: left; }
+        .admin-credentials { background: #d1fae5; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 0.75rem; text-align: center; border: 1px solid #10b981; }
         @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
         .toast-msg { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 12px; z-index: 1000; animation: slideIn 0.3s ease; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .admin-credentials { background: #d1fae5; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 0.7rem; text-align: center; }
     </style>
 </head>
 <body>
@@ -84,8 +82,9 @@
                 </div>
                 
                 <div class="admin-credentials">
-                    <strong>🔐 Admin Login Credentials:</strong><br>
-                    Email: <code>admin@tarl.com</code> | Password: <code>admin123</code>
+                    <strong>🔐 ADMIN LOGIN CREDENTIALS (WORKING):</strong><br>
+                    📧 Email: <code style="background:#fff;padding:2px 6px;border-radius:4px;">admin@tarl.com</code> &nbsp;&nbsp;|&nbsp;&nbsp;
+                    🔑 Password: <code style="background:#fff;padding:2px 6px;border-radius:4px;">admin123</code>
                 </div>
 
                 <div class="role-selector">
@@ -102,8 +101,8 @@
                 </div>
 
                 <div id="adminLoginForm" style="display:none;">
-                    <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@tarl.com" value="admin@tarl.com"></div>
-                    <div class="form-group"><label>Admin Password</label><input type="password" id="adminPassword" placeholder="admin123" value="admin123"></div>
+                    <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@tarl.com"></div>
+                    <div class="form-group"><label>Admin Password</label><input type="password" id="adminPassword" placeholder="admin123"></div>
                     <button class="btn btn-primary" onclick="loginAdmin()" style="width:100%;"><i class="fas fa-user-shield"></i> Login as Admin</button>
                 </div>
 
@@ -126,7 +125,7 @@
     <!-- ADMIN MAIN APP -->
     <div id="adminApp" style="display:none;">
         <div class="header">
-            <div class="logo"><h1><i class="fas fa-user-shield"></i> TaRL Admin Panel</h1><p>Administrator Dashboard | Email Approval System</p></div>
+            <div class="logo"><h1><i class="fas fa-user-shield"></i> TaRL Admin Panel</h1><p>Administrator Dashboard | Email: mohammedscho2023@gmail.com</p></div>
             <div class="stats-badge">
                 <div class="badge"><div class="number" id="adminTotalUsers">0</div><div class="label">Total Users</div></div>
                 <div class="badge"><div class="number" id="adminPendingUsers">0</div><div class="label">Pending</div></div>
@@ -153,15 +152,15 @@
         <div id="userManagement" class="section">
             <div class="card">
                 <div class="card-title"><i class="fas fa-users"></i> User Management - Approve/Reject Data Collectors</div>
-                <div style="overflow-x:auto;"><table class="data-table" id="adminUsersTable"><thead><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Role</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminUsersTableBody"></tbody>}</div>
+                <div style="overflow-x:auto;"><table class="data-table" id="adminUsersTable"><thead><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminUsersTableBody"></tbody>}</div>
             </div>
         </div>
 
         <div id="emailSimulator" class="section">
             <div class="card">
                 <div class="card-title"><i class="fas fa-envelope"></i> Email to Admin (mohammedscho2023@gmail.com)</div>
-                <div class="alert alert-info"><i class="fas fa-info-circle"></i> When a user registers, an approval email is sent to the admin. Click the links below to approve or reject users.</div>
-                <div id="emailSimulatorContent" class="email-sim">No emails sent yet. Register a user to see email simulation.</div>
+                <div class="alert alert-info"><i class="fas fa-info-circle"></i> When a user registers, an approval request appears here. Click Approve or Reject.</div>
+                <div id="emailSimulatorContent" class="email-sim">No pending approvals. Register a user to see approval requests.</div>
             </div>
         </div>
 
@@ -272,23 +271,19 @@
 </div>
 
 <script>
+    // Data Structures
     let users = [];
     let students = [];
     let currentUser = null;
     let activityLog = [];
-    let pendingEmails = [];
+    let pendingApprovals = [];
 
     const ADMIN_EMAIL = "admin@tarl.com";
     const ADMIN_PASSWORD = "admin123";
 
-    function saveData() {
-        localStorage.setItem('tarl_users', JSON.stringify(users));
-        localStorage.setItem('tarl_students', JSON.stringify(students));
-        localStorage.setItem('tarl_activity', JSON.stringify(activityLog));
-        localStorage.setItem('tarl_pendingEmails', JSON.stringify(pendingEmails));
-    }
-
-    function loadData() {
+    // FIXED: Initialize admin account on page load
+    function initializeSystem() {
+        // Load existing data
         const savedUsers = localStorage.getItem('tarl_users');
         if(savedUsers) {
             users = JSON.parse(savedUsers);
@@ -298,11 +293,12 @@
         
         students = JSON.parse(localStorage.getItem('tarl_students') || '[]');
         activityLog = JSON.parse(localStorage.getItem('tarl_activity') || '[]');
-        pendingEmails = JSON.parse(localStorage.getItem('tarl_pendingEmails') || '[]');
+        pendingApprovals = JSON.parse(localStorage.getItem('tarl_pending') || '[]');
         
-        // Check if admin exists - if not, create it
+        // Check if admin exists - if NOT, create it
         const adminExists = users.find(u => u.role === 'admin');
         if(!adminExists) {
+            console.log("Creating admin account...");
             users.push({
                 id: 'ADMIN_1',
                 name: 'System Administrator',
@@ -315,10 +311,17 @@
                 registeredAt: new Date().toISOString()
             });
             saveData();
-            console.log("Admin account created!");
+            console.log("Admin account created successfully!");
         }
         
         updateAll();
+    }
+
+    function saveData() {
+        localStorage.setItem('tarl_users', JSON.stringify(users));
+        localStorage.setItem('tarl_students', JSON.stringify(students));
+        localStorage.setItem('tarl_activity', JSON.stringify(activityLog));
+        localStorage.setItem('tarl_pending', JSON.stringify(pendingApprovals));
     }
 
     function logActivity(message) {
@@ -337,68 +340,69 @@
         setTimeout(() => toast.remove(), 3000);
     }
 
-    function sendApprovalEmail(user) {
-        pendingEmails.unshift({ 
-            userId: user.id, 
-            email: user.email, 
-            name: user.name, 
-            zone: user.zone, 
-            woreda: user.woreda, 
-            timestamp: new Date().toISOString() 
-        });
-        saveData();
-        updateEmailSimulator();
-        logActivity(`Approval request sent for user: ${user.name} (${user.email})`);
-        showToast(`Registration request sent to admin!`);
+    function addPendingApproval(user) {
+        if(!pendingApprovals.find(p => p.userId === user.id)) {
+            pendingApprovals.push({
+                userId: user.id,
+                name: user.name,
+                email: user.email,
+                zone: user.zone,
+                woreda: user.woreda,
+                timestamp: new Date().toISOString()
+            });
+            saveData();
+            updateEmailSimulator();
+            logActivity(`Pending approval added for: ${user.name}`);
+        }
     }
 
     function updateEmailSimulator() {
         const container = document.getElementById('emailSimulatorContent');
         if(!container) return;
-        if(pendingEmails.length === 0) {
-            container.innerHTML = 'No pending approval emails. When users register, emails will appear here.';
+        if(pendingApprovals.length === 0) {
+            container.innerHTML = '✅ No pending approvals. All users have been processed.';
             return;
         }
         let html = '';
-        pendingEmails.forEach(email => {
+        pendingApprovals.forEach(p => {
             html += `
-            <div style="background:#0f172a; margin-bottom:15px; padding:12px; border-radius:8px; border-left:4px solid #10b981;">
+            <div style="background:#0f172a; margin-bottom:15px; padding:12px; border-radius:8px; border-left:4px solid #f59e0b;">
                 <div><i class="fas fa-envelope"></i> <strong>To: mohammedscho2023@gmail.com</strong></div>
-                <div><i class="fas fa-user"></i> User: ${escapeHtml(email.name)} (${escapeHtml(email.email)})</div>
-                <div><i class="fas fa-map-marker-alt"></i> Zone: ${escapeHtml(email.zone)} | Woreda: ${escapeHtml(email.woreda)}</div>
-                <div><i class="fas fa-clock"></i> Requested: ${new Date(email.timestamp).toLocaleString()}</div>
-                <div style="margin-top:10px;">
-                    <button class="btn btn-success btn-sm" onclick="quickApprove('${email.userId}')"><i class="fas fa-check"></i> Approve via Email</button>
-                    <button class="btn btn-danger btn-sm" onclick="quickReject('${email.userId}')"><i class="fas fa-times"></i> Reject via Email</button>
+                <div><i class="fas fa-user"></i> <strong>User:</strong> ${escapeHtml(p.name)} (${escapeHtml(p.email)})</div>
+                <div><i class="fas fa-map-marker-alt"></i> <strong>Zone:</strong> ${escapeHtml(p.zone)} | <strong>Woreda:</strong> ${escapeHtml(p.woreda)}</div>
+                <div><i class="fas fa-clock"></i> <strong>Requested:</strong> ${new Date(p.timestamp).toLocaleString()}</div>
+                <div style="margin-top:12px;">
+                    <button class="btn btn-success btn-sm" onclick="approveUserFromEmail('${p.userId}')"><i class="fas fa-check"></i> ✅ Approve User</button>
+                    <button class="btn btn-danger btn-sm" onclick="rejectUserFromEmail('${p.userId}')"><i class="fas fa-times"></i> ❌ Reject User</button>
                 </div>
             </div>`;
         });
         container.innerHTML = html;
     }
 
-    function quickApprove(userId) {
+    function approveUserFromEmail(userId) {
         const user = users.find(u => u.id === userId);
-        if(user && user.status === 'pending') {
+        if(user) {
             user.status = 'approved';
-            pendingEmails = pendingEmails.filter(e => e.userId !== userId);
+            pendingApprovals = pendingApprovals.filter(p => p.userId !== userId);
             saveData();
-            logActivity(`User ${user.name} (${user.email}) was APPROVED`);
+            logActivity(`User ${user.name} was APPROVED via email link`);
             updateAdminApp();
             updateEmailSimulator();
             showToast(`${user.name} approved successfully!`);
         }
     }
 
-    function quickReject(userId) {
+    function rejectUserFromEmail(userId) {
         const user = users.find(u => u.id === userId);
         if(user) {
             users = users.filter(u => u.id !== userId);
-            pendingEmails = pendingEmails.filter(e => e.userId !== userId);
+            pendingApprovals = pendingApprovals.filter(p => p.userId !== userId);
             saveData();
-            logActivity(`User ${user?.name} was REJECTED`);
+            logActivity(`User ${user.name} was REJECTED via email link`);
             updateAdminApp();
             updateEmailSimulator();
-            showToast(`${user?.name} rejected.`, 'error');
+            showToast(`${user.name} rejected.`, 'error');
         }
     }
 
@@ -444,9 +448,9 @@
         };
         users.push(newUser);
         saveData();
-        logActivity(`New registration request: ${name} (${email}) - Zone: ${zone}, Woreda: ${woreda}`);
-        sendApprovalEmail(newUser);
-        alert(`Registration submitted! An approval request has been sent to the admin.\n\nYou will be able to login once approved.`);
+        addPendingApproval(newUser);
+        logActivity(`New registration: ${name} (${email}) - Zone: ${zone}, Woreda: ${woreda}`);
+        alert(`✅ Registration submitted!\n\nAn approval request has been sent to the admin.\nYou will be able to login once approved.`);
         showLoginForm();
         document.getElementById('regName').value = '';
         document.getElementById('regEmail').value = '';
@@ -465,9 +469,9 @@
             logActivity(`${user.name} (${user.zone}/${user.woreda}) logged in`);
             showUserApp();
         } else if(user && user.status === 'pending') {
-            alert('Your account is pending admin approval. Please wait.');
+            alert('⏳ Your account is pending admin approval. Please wait.');
         } else {
-            alert('Invalid email or password');
+            alert('❌ Invalid email or password');
         }
     }
 
@@ -480,7 +484,7 @@
             logActivity(`Admin ${admin.name} logged in`);
             showAdminApp();
         } else {
-            alert('Invalid admin credentials. Use: admin@tarl.com / admin123');
+            alert('❌ Invalid admin credentials.\n\nUse:\nEmail: admin@tarl.com\nPassword: admin123');
         }
     }
 
@@ -512,8 +516,8 @@
         document.getElementById('userApp').style.display = 'none';
         document.getElementById('userEmail').value = '';
         document.getElementById('userPassword').value = '';
-        document.getElementById('adminEmail').value = 'admin@tarl.com';
-        document.getElementById('adminPassword').value = 'admin123';
+        document.getElementById('adminEmail').value = '';
+        document.getElementById('adminPassword').value = '';
         selectLoginRole('user');
     }
 
@@ -535,7 +539,6 @@
         return { name: 'Computed', class: 'level-6', code: 6 };
     }
 
-    // ADMIN FUNCTIONS
     function updateAdminApp() {
         const dataCollectors = users.filter(u => u.role === 'data_collector');
         const pendingUsers = dataCollectors.filter(u => u.status === 'pending');
@@ -543,18 +546,18 @@
         document.getElementById('adminPendingUsers').textContent = pendingUsers.length;
         document.getElementById('adminTotalStudents').textContent = students.length;
         
-        document.getElementById('adminUserStats').innerHTML = `<div class="alert alert-info">Total Data Collectors: ${dataCollectors.length}<br>Approved: ${dataCollectors.filter(u=>u.status==='approved').length}<br>Pending: ${pendingUsers.length}</div>`;
-        document.getElementById('adminSchoolStats').innerHTML = `<div class="alert alert-success">Total Students: ${students.length}<br>Schools: ${[...new Set(students.map(s=>s.schoolName))].length}<br>Woredas: ${[...new Set(students.map(s=>s.woreda))].length}</div>`;
+        document.getElementById('adminUserStats').innerHTML = `<div class="alert alert-info">📊 Total Data Collectors: ${dataCollectors.length}<br>⏳ Pending Approval: ${pendingUsers.length}<br>✅ Approved: ${dataCollectors.filter(u=>u.status==='approved').length}</div>`;
+        document.getElementById('adminSchoolStats').innerHTML = `<div class="alert alert-success">🎓 Total Students: ${students.length}<br>🏫 Schools: ${[...new Set(students.map(s=>s.schoolName))].length}<br>📍 Woredas: ${[...new Set(students.map(s=>s.woreda))].length}</div>`;
         
         const tbody = document.getElementById('adminUsersTableBody');
         tbody.innerHTML = '';
         dataCollectors.forEach(u => {
             tbody.innerHTML += `<tr style="${u.status === 'pending' ? 'background:#fef3c7;' : ''}">
                 <td>${escapeHtml(u.name)}</td><td>${escapeHtml(u.email)}</td><td>${escapeHtml(u.zone)}</td><td>${escapeHtml(u.woreda)}</td>
-                <td>Data Collector</td><td>${u.status === 'approved' ? '<span class="level-badge level-4">Approved</span>' : '<span class="level-badge level-2">Pending</span>'}</td>
+                <td>${u.status === 'approved' ? '<span class="level-badge level-4">✅ Approved</span>' : '<span class="level-badge level-2">⏳ Pending</span>'}</td>
                 <td>${new Date(u.registeredAt).toLocaleDateString()}</td>
-                <td>${u.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveUser('${u.id}')"><i class="fas fa-check"></i> Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectUser('${u.id}')"><i class="fas fa-times"></i> Reject</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i> Delete</button>`}</td>
-            <tr>`;
+                <td>${u.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveUserFromEmail('${u.id}')"><i class="fas fa-check"></i> Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectUserFromEmail('${u.id}')"><i class="fas fa-times"></i> Reject</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i> Delete</button>`}</td>
+            </tr>`;
         });
     }
 
@@ -565,39 +568,15 @@
         }
     }
 
-    function approveUser(userId) {
-        const user = users.find(u => u.id === userId);
-        if(user) { 
-            user.status = 'approved'; 
-            pendingEmails = pendingEmails.filter(e => e.userId !== userId);
-            saveData(); 
-            logActivity(`User ${user.name} was APPROVED`); 
-            updateAdminApp(); 
-            updateEmailSimulator();
-            showToast(`${user.name} approved!`);
-        }
-    }
-
-    function rejectUser(userId) {
-        const user = users.find(u => u.id === userId);
-        if(user) { 
-            users = users.filter(u => u.id !== userId); 
-            pendingEmails = pendingEmails.filter(e => e.userId !== userId);
-            saveData(); 
-            logActivity(`User ${user.name} was REJECTED`); 
-            updateAdminApp(); 
-            updateEmailSimulator();
-            showToast(`${user.name} rejected.`, 'error');
-        }
-    }
-
     function deleteUser(userId) {
         if(confirm('Delete this user?')) {
             const user = users.find(u => u.id === userId);
             users = users.filter(u => u.id !== userId);
+            pendingApprovals = pendingApprovals.filter(p => p.userId !== userId);
             saveData();
             logActivity(`User ${user?.name} was DELETED`);
             updateAdminApp();
+            updateEmailSimulator();
             showToast(`${user?.name} deleted.`);
         }
     }
@@ -607,15 +586,14 @@
         let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaRL Admin Report</title><style>body{font-family:Arial;margin:40px;}</style></head><body>
         <h1>TaRL Department - Admin Report</h1><p>Generated: ${new Date().toLocaleString()}</p>
         <h2>Users</h2><table border="1"><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Status</th></tr>`;
-        users.filter(u=>u.role==='data_collector').forEach(u => html += `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.zone}</td><td>${u.woreda}</td><td>${u.status}</td>`);
+        users.filter(u=>u.role==='data_collector').forEach(u => html += `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.zone}</td><td>${u.woreda}</td><td>${u.status}</td></tr>`);
         html += `</table><h2>Students</h2><table border="1"><tr><th>Name</th><th>School</th><th>Zone</th><th>Woreda</th><th>English</th><th>Oromo</th></tr>`;
-        students.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>${s.zone}</td><td>${s.woreda}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td>`);
+        students.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>${s.zone}</td><td>${s.woreda}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td></tr>`);
         html += `</table></body></html>`;
         if(format === 'html') { const w=window.open(); w.document.write(html); w.document.close(); }
         else { const div=document.createElement('div'); div.innerHTML=html; document.body.appendChild(div); html2pdf().from(div).set({margin:1}).save(); setTimeout(()=>document.body.removeChild(div),1000); }
     }
 
-    // USER FUNCTIONS
     function getUserStudents() { return students.filter(s => s.zone === currentUser?.zone && s.woreda === currentUser?.woreda); }
 
     function registerUserStudent() {
@@ -662,8 +640,7 @@
             tbody.innerHTML += `<tr><td>${s.id.substring(0,10)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.schoolName)}</td><td>Kutaa ${s.grade}</td>
             <td>${s.englishScore}/5 <span class="level-badge ${s.englishLevel.class}">${s.englishLevel.name}</span></td>
             <td>${s.oromoScore}/5 <span class="level-badge ${s.oromoLevel.class}">${s.oromoLevel.name}</span></td>
-            <td><button class="btn btn-danger btn-sm" onclick="deleteUserStudent('${s.id}')"><i class="fas fa-trash"></i></button></td>
-            </tr>`;
+            <td><button class="btn btn-danger btn-sm" onclick="deleteUserStudent('${s.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
         });
         
         const wMap = new Map();
@@ -696,9 +673,9 @@
         const total = userStudents.length;
         const avgEng = total ? (userStudents.reduce((s,st)=>s+st.englishScore,0)/total)*20 : 0;
         const avgOro = total ? (userStudents.reduce((s,st)=>s+st.oromoScore,0)/total)*20 : 0;
-        document.getElementById('userProgramSummary').innerHTML = `<div class="grid-3"><div class="alert alert-info"><strong>My Enrollment</strong><br>Total: ${total}</div>
-        <div class="alert alert-success"><strong>My Average Scores</strong><br>English: ${avgEng.toFixed(1)}%<br>Afaan Oromoo: ${avgOro.toFixed(1)}%</div>
-        <div class="alert alert-info"><strong>My Coverage</strong><br>Schools: ${[...new Set(userStudents.map(s=>s.schoolName))].length}<br>Woreda: ${currentUser.woreda}</div></div>`;
+        document.getElementById('userProgramSummary').innerHTML = `<div class="grid-3"><div class="alert alert-info"><strong>📊 My Enrollment</strong><br>Total: ${total}</div>
+        <div class="alert alert-success"><strong>📈 My Average Scores</strong><br>English: ${avgEng.toFixed(1)}%<br>Afaan Oromoo: ${avgOro.toFixed(1)}%</div>
+        <div class="alert alert-info"><strong>🏫 My Coverage</strong><br>Schools: ${[...new Set(userStudents.map(s=>s.schoolName))].length}<br>Woreda: ${currentUser.woreda}</div></div>`;
     }
 
     function updateUserGrouping() {
@@ -725,18 +702,18 @@
         if(type === 'woreda') {
             const map = new Map();
             userStudents.forEach(s => { const key = `${s.grade}`; if(!map.has(key)) map.set(key, { grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
-            html += `<h2>Woreda Summary</h2><table border="1"><tr><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
-            for(let d of map.values()) html += `<tr><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td>`;
-            html += ` licensierad`;
+            html += `<h2>Woreda Summary</h2><table border="1"><tr><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr>`;
+            for(let d of map.values()) html += `<tr><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
+            html += `</table>`;
         } else if(type === 'school') {
             const map = new Map();
             userStudents.forEach(s => { const key = `${s.schoolName}|${s.grade}`; if(!map.has(key)) map.set(key, { school:s.schoolName, grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
-            html += `<h2>School Summary</h2><table border="1"><tr><th>School</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
-            for(let d of map.values()) html += `<tr><td>${d.school}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td>`;
+            html += `<h2>School Summary</h2><table border="1"><tr><th>School</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr>`;
+            for(let d of map.values()) html += `<tr><td>${d.school}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
             html += `</table>`;
         } else {
-            html += `<h2>Student Roster</h2><table border="1"><tr><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th>`;
-            userStudents.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td>`);
+            html += `<h2>Student Roster</h2><table border="1"><tr><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th></tr>`;
+            userStudents.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td></tr>`);
             html += `</table>`;
         }
         html += `</body></html>`;
@@ -757,7 +734,9 @@
     });
 
     function updateAll() { }
-    loadData();
+    
+    // Initialize the system
+    initializeSystem();
     selectLoginRole('user');
 </script>
 </body>
