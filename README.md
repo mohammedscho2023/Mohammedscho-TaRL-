@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaRL Department | User Registration & Admin Control | Teaching at the Right Level</title>
+    <title>TaRL Department | Role-Based Access | Admin & Data Collector Login</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -51,7 +51,6 @@
         .alert-info { background: #dbeafe; color: #1e40af; border-left: 4px solid #2563eb; }
         .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
         .alert-warning { background: #fed7aa; color: #92400e; border-left: 4px solid #f59e0b; }
-        .alert-danger { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
         .level-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
         .level-1 { background: #fee2e2; color: #991b1b; }
         .level-2 { background: #fed7aa; color: #9a3412; }
@@ -61,14 +60,18 @@
         .level-6 { background: #e0e7ff; color: #3730a3; }
         .footer { text-align: center; padding: 20px; color: rgba(255,255,255,0.5); font-size: 0.7rem; }
         .login-container { max-width: 500px; margin: 50px auto; }
-        .user-info { display: flex; align-items: center; gap: 15px; background: #f1f5f9; padding: 10px 20px; border-radius: 40px; }
+        .role-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .role-btn { flex: 1; padding: 12px; border: 2px solid #e2e8f0; background: white; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.3s; }
+        .role-btn.active { border-color: #2563eb; background: #dbeafe; color: #2563eb; }
+        .user-info { display: flex; align-items: center; gap: 15px; background: #f1f5f9; padding: 8px 18px; border-radius: 40px; }
         .user-avatar { width: 35px; height: 35px; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
         @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        .zone-badge { background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 12px; font-size: 0.65rem; }
     </style>
 </head>
 <body>
 <div class="dashboard-container" id="app">
-    <!-- Login/Register Section (Shown when not logged in) -->
+    <!-- LOGIN SECTION -->
     <div id="authSection">
         <div class="login-container">
             <div class="card" style="text-align: center;">
@@ -76,144 +79,178 @@
                     <h1><i class="fas fa-chalkboard-user"></i> TaRL Department</h1>
                     <p>Teaching at the Right Level Management System</p>
                 </div>
-                <div id="loginForm">
-                    <div class="form-group"><label>Email Address</label><input type="email" id="loginEmail" placeholder="Enter your email"></div>
-                    <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password"></div>
-                    <button class="btn btn-primary" onclick="loginUser()" style="width:100%;"><i class="fas fa-sign-in-alt"></i> Login</button>
+                
+                <div class="role-selector">
+                    <div class="role-btn active" data-role="user" onclick="selectLoginRole('user')"><i class="fas fa-user"></i> User Login</div>
+                    <div class="role-btn" data-role="admin" onclick="selectLoginRole('admin')"><i class="fas fa-user-shield"></i> Admin Login</div>
+                </div>
+
+                <div id="userLoginForm">
+                    <div class="form-group"><label>Email Address</label><input type="email" id="userEmail" placeholder="Enter your email"></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="userPassword" placeholder="Enter password"></div>
+                    <button class="btn btn-primary" onclick="loginUser()" style="width:100%;"><i class="fas fa-sign-in-alt"></i> Login as User</button>
                     <hr style="margin: 20px 0;">
                     <p>Don't have an account? <a href="#" onclick="showRegister()">Register here</a></p>
                 </div>
-                <div id="registerForm" style="display:none;">
+
+                <div id="adminLoginForm" style="display:none;">
+                    <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@example.com"></div>
+                    <div class="form-group"><label>Admin Password</label><input type="password" id="adminPassword" placeholder="Enter password"></div>
+                    <button class="btn btn-primary" onclick="loginAdmin()" style="width:100%;"><i class="fas fa-user-shield"></i> Login as Admin</button>
+                </div>
+
+                <div id="registerForm" style="display:none; margin-top:20px;">
+                    <hr>
+                    <h3>Register New Account</h3>
                     <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Your full name"></div>
                     <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" placeholder="Enter your email"></div>
                     <div class="form-group"><label>Password</label><input type="password" id="regPassword" placeholder="Create password"></div>
                     <div class="form-group"><label>Confirm Password</label><input type="password" id="regConfirmPassword" placeholder="Confirm password"></div>
-                    <div class="form-group"><label>Role</label><select id="regRole"><option value="teacher">Teacher (Barsiisaa)</option><option value="supervisor">Supervisor (Illee)</option><option value="admin">Admin (Admin)</option></select></div>
-                    <button class="btn btn-primary" onclick="registerUser()" style="width:100%;"><i class="fas fa-user-plus"></i> Register</button>
-                    <hr style="margin: 20px 0;">
-                    <p>Already have an account? <a href="#" onclick="showLogin()">Login here</a></p>
+                    <div class="form-group"><label>Zone (Godina)</label><select id="regZone"><option value="">Select Zone</option><option value="East Wolega">East Wolega</option><option value="West Wolega">West Wolega</option><option value="North Shewa">North Shewa</option></select></div>
+                    <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="regWoreda" placeholder="e.g., Leka Dulecha, Gimbi, Kuyu"></div>
+                    <button class="btn btn-success" onclick="registerUser()" style="width:100%;"><i class="fas fa-user-plus"></i> Register</button>
+                    <p style="margin-top:15px;"><a href="#" onclick="showLoginForm()">Back to Login</a></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main App Section (Shown after login) -->
-    <div id="mainApp" style="display:none;">
+    <!-- ADMIN MAIN APP -->
+    <div id="adminApp" style="display:none;">
         <div class="header">
-            <div class="logo"><h1><i class="fas fa-chalkboard-user"></i> TaRL Department</h1><p>Teaching at the Right Level | Student Registration → Woreda/School Feed</p></div>
+            <div class="logo"><h1><i class="fas fa-user-shield"></i> TaRL Admin Panel</h1><p>Administrator Dashboard | User Management & Approval</p></div>
             <div class="stats-badge">
-                <div class="badge"><div class="number" id="totalStudents">0</div><div class="label">Total Students</div></div>
-                <div class="badge"><div class="number" id="totalSchools">0</div><div class="label">Schools</div></div>
-                <div class="badge"><div class="number" id="avgEnglish">0%</div><div class="label">Avg English</div></div>
-                <div class="badge"><div class="number" id="avgOromo">0%</div><div class="label">Avg Afaan Oromoo</div></div>
-                <div class="user-info" id="userInfoDisplay"></div>
+                <div class="badge"><div class="number" id="adminTotalUsers">0</div><div class="label">Total Users</div></div>
+                <div class="badge"><div class="number" id="adminPendingUsers">0</div><div class="label">Pending</div></div>
+                <div class="badge"><div class="number" id="adminTotalStudents">0</div><div class="label">Students</div></div>
+                <div class="user-info"><div class="user-avatar"><i class="fas fa-user-shield"></i></div><span id="adminName">Admin</span> <button class="btn btn-sm btn-danger" onclick="logout()" style="margin-left:10px;"><i class="fas fa-sign-out-alt"></i></button></div>
             </div>
         </div>
-
-        <div class="nav-tabs" id="navTabs">
-            <button class="nav-btn active" data-section="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
-            <button class="nav-btn" data-section="studentReg"><i class="fas fa-user-plus"></i> Student Registration</button>
-            <button class="nav-btn" data-section="grouping"><i class="fas fa-layer-group"></i> Grouping by Grade</button>
-            <button class="nav-btn" data-section="woreda"><i class="fas fa-map-marker-alt"></i> Woreda Level</button>
-            <button class="nav-btn" data-section="school"><i class="fas fa-school"></i> School Level</button>
-            <button class="nav-btn" data-section="reports"><i class="fas fa-file-alt"></i> Reports</button>
-            <button class="nav-btn admin-only" data-section="admin" style="display:none;"><i class="fas fa-user-shield"></i> Admin Panel</button>
-            <button class="nav-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <div class="nav-tabs">
+            <button class="nav-btn active" data-section="adminDashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
+            <button class="nav-btn" data-section="userManagement"><i class="fas fa-users"></i> User Management</button>
+            <button class="nav-btn" data-section="adminReports"><i class="fas fa-file-alt"></i> Reports</button>
+            <button class="nav-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
-        <!-- DASHBOARD SECTION -->
-        <div id="dashboard" class="section active">
+        <div id="adminDashboard" class="section active">
             <div class="grid-3">
-                <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> English Progress by Grade</div><div class="chart-container" style="height:250px;"><canvas id="englishGradeChart"></canvas></div></div>
-                <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> Afaan Oromoo Progress by Grade</div><div class="chart-container" style="height:250px;"><canvas id="oromoGradeChart"></canvas></div></div>
-                <div class="card"><div class="card-title"><i class="fas fa-chart-pie"></i> Student Distribution by Level</div><div class="chart-container" style="height:250px;"><canvas id="levelDistributionChart"></canvas></div></div>
+                <div class="card"><div class="card-title"><i class="fas fa-users"></i> User Statistics</div><div id="adminUserStats"></div></div>
+                <div class="card"><div class="card-title"><i class="fas fa-school"></i> School Statistics</div><div id="adminSchoolStats"></div></div>
+                <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> System Activity</div><div id="adminActivityLog"></div></div>
             </div>
-            <div class="card"><div class="card-title"><i class="fas fa-tachometer-alt"></i> TaRL Program Summary</div><div id="programSummary"></div></div>
         </div>
 
-        <!-- STUDENT REGISTRATION -->
-        <div id="studentReg" class="section">
+        <div id="userManagement" class="section">
             <div class="card">
-                <div class="card-title"><i class="fas fa-user-plus"></i> Register Student (Data Feeds to Woreda & School)</div>
+                <div class="card-title"><i class="fas fa-users"></i> User Management - Approve/Reject Data Collectors</div>
+                <div style="overflow-x:auto;"><table class="data-table" id="adminUsersTable"><thead><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Role</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminUsersTableBody"></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="adminReports" class="section">
+            <div class="card"><div class="card-title"><i class="fas fa-file-pdf"></i> Generate System Report</div>
+                <div class="form-group"><label>Format</label><select id="adminReportFormat"><option value="html">HTML</option><option value="pdf">PDF</option></select></div>
+                <button class="btn btn-primary" onclick="generateAdminReport()"><i class="fas fa-download"></i> Generate Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER MAIN APP (Data Collector - Zone/Woreda Restricted) -->
+    <div id="userApp" style="display:none;">
+        <div class="header">
+            <div class="logo"><h1><i class="fas fa-chalkboard-user"></i> TaRL Department</h1><p id="userLocationDisplay">Teaching at the Right Level</p></div>
+            <div class="stats-badge">
+                <div class="badge"><div class="number" id="userTotalStudents">0</div><div class="label">My Students</div></div>
+                <div class="badge"><div class="number" id="userTotalSchools">0</div><div class="label">My Schools</div></div>
+                <div class="badge"><div class="number" id="userAvgEnglish">0%</div><div class="label">Avg English</div></div>
+                <div class="badge"><div class="number" id="userAvgOromo">0%</div><div class="label">Avg Afaan Oromoo</div></div>
+                <div class="user-info"><div class="user-avatar"><i class="fas fa-user"></i></div><span id="userNameDisplay"></span> <button class="btn btn-sm btn-danger" onclick="logout()" style="margin-left:10px;"><i class="fas fa-sign-out-alt"></i></button></div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-btn active" data-section="userDashboard"><i class="fas fa-chart-pie"></i> My Dashboard</button>
+            <button class="nav-btn" data-section="userStudentReg"><i class="fas fa-user-plus"></i> Register Student</button>
+            <button class="nav-btn" data-section="userGrouping"><i class="fas fa-layer-group"></i> Grouping by Grade</button>
+            <button class="nav-btn" data-section="userWoreda"><i class="fas fa-map-marker-alt"></i> My Woreda Summary</button>
+            <button class="nav-btn" data-section="userSchool"><i class="fas fa-school"></i> My Schools</button>
+            <button class="nav-btn" data-section="userReports"><i class="fas fa-file-alt"></i> Reports</button>
+            <button class="nav-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+
+        <div id="userDashboard" class="section active">
+            <div class="grid-3">
+                <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> English Progress by Grade</div><div class="chart-container" style="height:250px;"><canvas id="userEnglishChart"></canvas></div></div>
+                <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> Afaan Oromoo Progress</div><div class="chart-container" style="height:250px;"><canvas id="userOromoChart"></canvas></div></div>
+                <div class="card"><div class="card-title"><i class="fas fa-chart-pie"></i> Level Distribution</div><div class="chart-container" style="height:250px;"><canvas id="userLevelChart"></canvas></div></div>
+            </div>
+            <div class="card"><div class="card-title"><i class="fas fa-tachometer-alt"></i> My Program Summary</div><div id="userProgramSummary"></div></div>
+        </div>
+
+        <div id="userStudentReg" class="section">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-user-plus"></i> Register Student (Data feeds to Woreda & School)</div>
                 <div class="grid-3">
-                    <div class="form-group"><label>Zone (Godina)</label><input type="text" id="studentZone" placeholder="e.g., East Wolega"></div>
-                    <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="studentWoreda" placeholder="e.g., Leka Dulecha"></div>
-                    <div class="form-group"><label>School ID</label><input type="text" id="studentSchoolId" placeholder="School ID"></div>
-                    <div class="form-group"><label>School Name</label><input type="text" id="studentSchoolName" placeholder="School Name"></div>
-                    <div class="form-group"><label>Learner ID</label><input type="text" id="learnerId" placeholder="Auto-generated" readonly></div>
-                    <div class="form-group"><label>Student Name</label><input type="text" id="studentName" placeholder="Full Name"></div>
-                    <div class="form-group"><label>Sex</label><select id="studentSex"><option value="M">Male (Dhiirra)</option><option value="F">Female (Dubartii)</option></select></div>
-                    <div class="form-group"><label>Grade</label><select id="studentGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
-                    <div class="form-group"><label>Special Needs</label><select id="specialNeeds"><option value="None">None</option><option value="Vision">Vision</option><option value="Hearing">Hearing</option><option value="Physical">Physical</option></select></div>
+                    <div class="form-group"><label>Zone (Godina)</label><input type="text" id="userStudentZone" readonly style="background:#f1f5f9;"></div>
+                    <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="userStudentWoreda" readonly style="background:#f1f5f9;"></div>
+                    <div class="form-group"><label>School ID</label><input type="text" id="userStudentSchoolId" placeholder="School ID"></div>
+                    <div class="form-group"><label>School Name</label><input type="text" id="userStudentSchoolName" placeholder="School Name"></div>
+                    <div class="form-group"><label>Learner ID</label><input type="text" id="userLearnerId" placeholder="Auto-generated" readonly></div>
+                    <div class="form-group"><label>Student Name</label><input type="text" id="userStudentName" placeholder="Full Name"></div>
+                    <div class="form-group"><label>Sex</label><select id="userStudentSex"><option value="M">Male (Dhiirra)</option><option value="F">Female (Dubartii)</option></select></div>
+                    <div class="form-group"><label>Grade</label><select id="userStudentGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
+                    <div class="form-group"><label>Special Needs</label><select id="userSpecialNeeds"><option value="None">None</option><option value="Vision">Vision</option><option value="Hearing">Hearing</option><option value="Physical">Physical</option></select></div>
                 </div>
                 <div class="grid-2">
                     <div><h4>English Assessment (5 Components)</h4>
-                        <div class="form-group"><label>Beginners</label><input type="number" id="studentEngBeginners" placeholder="0/1" max="1" min="0"></div>
-                        <div class="form-group"><label>Arfii (Alphabet)</label><input type="number" id="studentEngAlphabet" placeholder="0/1" max="1" min="0"></div>
-                        <div class="form-group"><label>Jechoota (Words)</label><input type="number" id="studentEngWords" placeholder="0/1" max="1" min="0"></div>
-                        <div class="form-group"><label>Keeyyata Salphaa (Sentence)</label><input type="number" id="studentEngSentence" placeholder="0/1" max="1" min="0"></div>
-                        <div class="form-group"><label>Seenessaa (Story)</label><input type="number" id="studentEngStory" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Beginners</label><input type="number" id="userEngBeginners" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Arfii (Alphabet)</label><input type="number" id="userEngAlphabet" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Jechoota (Words)</label><input type="number" id="userEngWords" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Keeyyata Salphaa (Sentence)</label><input type="number" id="userEngSentence" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Seenessaa (Story)</label><input type="number" id="userEngStory" placeholder="0/1" max="1" min="0"></div>
                     </div>
                     <div><h4>Afaan Oromoo Assessment (5 Components)</h4>
-                        <div class="form-group"><label>Beginners</label><input type="number" id="studentOromoBeginners" placeholder="0/1" max="1" min="0"></div>
-                        <div class="form-group"><label>Qubee</label><input type="number" id="studentOromoQubee" placeholder="0/1" max="1" min="0"></div>
-                        <div class="form-group"><label>Jecha</label><input type="number" id="studentOromoWord" placeholder="0/1" max="1" min="0"></div>
-                        <div class="form-group"><label>Keeyyata Salphaa</label><input type="number" id="studentOromoSentence" placeholder="0/1" max="1" min="0"></div>
-                        <div class="form-group"><label>Seenessaa</label><input type="number" id="studentOromoStory" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Beginners</label><input type="number" id="userOromoBeginners" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Qubee</label><input type="number" id="userOromoQubee" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Jecha</label><input type="number" id="userOromoWord" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Keeyyata Salphaa</label><input type="number" id="userOromoSentence" placeholder="0/1" max="1" min="0"></div>
+                        <div class="form-group"><label>Seenessaa</label><input type="number" id="userOromoStory" placeholder="0/1" max="1" min="0"></div>
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="registerStudent()"><i class="fas fa-save"></i> Register Student</button>
+                <button class="btn btn-primary" onclick="registerUserStudent()"><i class="fas fa-save"></i> Register Student</button>
             </div>
-            <div class="card"><div class="card-title"><i class="fas fa-table-list"></i> Registered Students</div><div style="overflow-x:auto;"><table class="data-table" id="studentTable"><thead><tr><th>ID</th><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th><th>Actions</th></tr></thead><tbody id="studentTableBody"></tbody></table></div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-table-list"></i> My Students</div><div style="overflow-x:auto;"><table class="data-table" id="userStudentTable"><thead><tr><th>ID</th><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th><th>Actions</th></tr></thead><tbody id="userStudentTableBody"></tbody></table></div></div>
         </div>
 
-        <!-- GROUPING SECTION -->
-        <div id="grouping" class="section">
+        <div id="userGrouping" class="section">
             <div class="card"><div class="card-title"><i class="fas fa-layer-group"></i> Grouping by Grade & TaRL Level</div>
-                <div class="form-group"><label>Select Grade</label><select id="groupGradeSelect"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
-                <button class="btn btn-primary" onclick="updateGrouping()"><i class="fas fa-chart-line"></i> Show Grouping</button>
-                <div id="groupingDisplay" style="margin-top:20px;"></div>
+                <div class="form-group"><label>Select Grade</label><select id="userGroupGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
+                <button class="btn btn-primary" onclick="updateUserGrouping()"><i class="fas fa-chart-line"></i> Show Grouping</button>
+                <div id="userGroupingDisplay" style="margin-top:20px;"></div>
             </div>
         </div>
 
-        <!-- WOREDA LEVEL -->
-        <div id="woreda" class="section">
-            <div class="card"><div class="card-title"><i class="fas fa-map-marker-alt"></i> Woreda Level Summary</div>
-                <div style="overflow-x:auto;"><table class="data-table" id="woredaTable"><thead><tr><th>Zone</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr></thead><tbody id="woredaTableBody"></tbody></table></div>
+        <div id="userWoreda" class="section">
+            <div class="card"><div class="card-title"><i class="fas fa-map-marker-alt"></i> My Woreda Summary (Auto-Generated)</div>
+                <div style="overflow-x:auto;"><table class="data-table" id="userWoredaTable"><thead><tr><th>Zone</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr></thead><tbody id="userWoredaTableBody"></tbody></table></div>
             </div>
         </div>
 
-        <!-- SCHOOL LEVEL -->
-        <div id="school" class="section">
-            <div class="card"><div class="card-title"><i class="fas fa-school"></i> School Level Summary</div>
-                <div style="overflow-x:auto;"><table class="data-table" id="schoolTable"><thead><tr><th>School</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr></thead><tbody id="schoolTableBody"></tbody></table></div>
+        <div id="userSchool" class="section">
+            <div class="card"><div class="card-title"><i class="fas fa-school"></i> My Schools Summary</div>
+                <div style="overflow-x:auto;"><table class="data-table" id="userSchoolTable"><thead><tr><th>School</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr></thead><tbody id="userSchoolTableBody"></tbody></table></div>
             </div>
         </div>
 
-        <!-- REPORTS SECTION -->
-        <div id="reports" class="section">
-            <div class="card"><div class="card-title"><i class="fas fa-file-pdf"></i> Generate Report</div>
-                <div class="grid-2">
-                    <div><div class="form-group"><label>Report Type</label><select id="reportType"><option value="woreda">Woreda Level</option><option value="school">School Level</option><option value="student">Student Roster</option></select></div></div>
-                    <div><div class="form-group"><label>Format</label><select id="reportFormat"><option value="html">HTML</option><option value="pdf">PDF</option></select></div></div>
-                </div>
-                <button class="btn btn-primary" onclick="generateReport()"><i class="fas fa-download"></i> Generate Report</button>
+        <div id="userReports" class="section">
+            <div class="card"><div class="card-title"><i class="fas fa-file-pdf"></i> Generate My Report</div>
+                <div class="grid-2"><div><div class="form-group"><label>Report Type</label><select id="userReportType"><option value="woreda">Woreda Summary</option><option value="school">School Summary</option><option value="student">Student Roster</option></select></div></div>
+                <div><div class="form-group"><label>Format</label><select id="userReportFormat"><option value="html">HTML</option><option value="pdf">PDF</option></select></div></div></div>
+                <button class="btn btn-primary" onclick="generateUserReport()"><i class="fas fa-download"></i> Generate Report</button>
             </div>
         </div>
-
-        <!-- ADMIN PANEL SECTION -->
-        <div id="admin" class="section">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-user-shield"></i> Admin Panel - User Management</div>
-                <div style="overflow-x:auto;"><table class="data-table" id="usersTable"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="usersTableBody"></tbody></table></div>
-                <div class="alert alert-info" style="margin-top:15px;"><i class="fas fa-envelope"></i> Approval emails are sent to: <strong>mohammed.scho2023@gmail.com</strong>. Click the link in the email to approve/reject users.</div>
-            </div>
-            <div class="card">
-                <div class="card-title"><i class="fas fa-chart-line"></i> System Activity Log</div>
-                <div id="activityLog"></div>
-            </div>
-        </div>
-        <div class="footer"><p>TaRL Department | User Registration with Email Verification | Admin Approval System</p></div>
+        <div class="footer"><p>TaRL Department | Data Collectors only see their approved Zone & Woreda</p></div>
     </div>
 </div>
 
@@ -221,193 +258,141 @@
     // Data Structures
     let users = [];
     let students = [];
-    let pendingUsers = [];
     let currentUser = null;
     let activityLog = [];
 
-    // Admin email
-    const ADMIN_EMAIL = "mohammed.scho2023@gmail.com";
+    const ADMIN_EMAIL = "admin@tarl.com";
+    const ADMIN_PASSWORD = "admin123";
 
-    // Load/Save
     function saveData() {
         localStorage.setItem('tarl_users', JSON.stringify(users));
         localStorage.setItem('tarl_students', JSON.stringify(students));
-        localStorage.setItem('tarl_pending', JSON.stringify(pendingUsers));
         localStorage.setItem('tarl_activity', JSON.stringify(activityLog));
-        localStorage.setItem('tarl_currentUser', JSON.stringify(currentUser));
     }
 
     function loadData() {
         users = JSON.parse(localStorage.getItem('tarl_users') || '[]');
         students = JSON.parse(localStorage.getItem('tarl_students') || '[]');
-        pendingUsers = JSON.parse(localStorage.getItem('tarl_pending') || '[]');
         activityLog = JSON.parse(localStorage.getItem('tarl_activity') || '[]');
-        const savedUser = localStorage.getItem('tarl_currentUser');
-        if(savedUser && savedUser !== 'null') {
-            currentUser = JSON.parse(savedUser);
-            if(currentUser && currentUser.status === 'approved') showMainApp();
-            else showAuth();
-        } else {
-            showAuth();
-        }
+        
         // Create default admin if none exists
-        if(users.length === 0) {
-            users.push({ id: 'ADMIN_1', name: 'System Admin', email: ADMIN_EMAIL, password: btoa('admin123'), role: 'admin', status: 'approved', registeredAt: new Date().toISOString() });
+        if(!users.find(u => u.role === 'admin')) {
+            users.push({ id: 'ADMIN_1', name: 'System Administrator', email: ADMIN_EMAIL, password: btoa(ADMIN_PASSWORD), role: 'admin', zone: '', woreda: '', status: 'approved', registeredAt: new Date().toISOString() });
             saveData();
         }
         updateAll();
-    }
-
-    function showAuth() { document.getElementById('authSection').style.display = 'block'; document.getElementById('mainApp').style.display = 'none'; }
-    function showMainApp() { document.getElementById('authSection').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; updateUserDisplay(); updateAll(); }
-
-    function showRegister() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; }
-    function showLogin() { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; }
-
-    function registerUser() {
-        const name = document.getElementById('regName').value;
-        const email = document.getElementById('regEmail').value;
-        const password = document.getElementById('regPassword').value;
-        const confirm = document.getElementById('regConfirmPassword').value;
-        const role = document.getElementById('regRole').value;
-        
-        if(!name || !email || !password) { alert('Please fill all fields'); return; }
-        if(password !== confirm) { alert('Passwords do not match'); return; }
-        if(users.find(u => u.email === email)) { alert('Email already registered'); return; }
-        
-        // Check if already pending
-        if(pendingUsers.find(u => u.email === email)) { alert('Registration already pending approval'); return; }
-        
-        const pendingUser = { id: 'PEND_' + Date.now(), name, email, password: btoa(password), role, status: 'pending', registeredAt: new Date().toISOString() };
-        pendingUsers.push(pendingUser);
-        saveData();
-        
-        // Generate approval link (simulated email)
-        const approvalLink = `https://tarl-system.approve?user=${pendingUser.id}&action=approve`;
-        const rejectLink = `https://tarl-system.approve?user=${pendingUser.id}&action=reject`;
-        
-        // Log activity
-        logActivity(`New registration request from ${name} (${email}) with role ${role}. Waiting for admin approval.`);
-        
-        // Simulate sending email to admin (display in console and alert)
-        console.log(`\n========== EMAIL TO ADMIN (${ADMIN_EMAIL}) ==========`);
-        console.log(`Subject: New TaRL User Registration - Action Required`);
-        console.log(`\nDear Admin,\n\nA new user has registered for the TaRL Department Management System.\n\nUser Details:\n- Name: ${name}\n- Email: ${email}\n- Role: ${role}\n- Requested: ${new Date().toLocaleString()}\n\nTo APPROVE this user, click the link below (or copy and paste):\n${approvalLink}\n\nTo REJECT this user, click:\n${rejectLink}\n\nYou can also manage users from the Admin Panel in the system.\n\nRegards,\nTaRL Department System`);
-        console.log(`===================================================\n`);
-        
-        alert(`Registration request submitted!\n\nAn approval request has been sent to the admin (${ADMIN_EMAIL}).\nYou will receive an email confirmation once approved.\n\nPlease check your email for the approval link.`);
-        
-        // Store pending approval in a way that can be accessed via URL params
-        sessionStorage.setItem('pendingAction', JSON.stringify({ userId: pendingUser.id, email: email }));
-        
-        showLogin();
-        document.getElementById('regName').value = '';
-        document.getElementById('regEmail').value = '';
-        document.getElementById('regPassword').value = '';
-        document.getElementById('regConfirmPassword').value = '';
-    }
-
-    function loginUser() {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        const user = users.find(u => u.email === email && atob(u.password) === password);
-        if(user && user.status === 'approved') {
-            currentUser = user;
-            saveData();
-            showMainApp();
-            logActivity(`${user.name} (${user.role}) logged in`);
-            alert(`Welcome back, ${user.name}!`);
-        } else if(user && user.status === 'pending') {
-            alert('Your account is pending admin approval. Please wait for confirmation email.');
-        } else {
-            alert('Invalid email or password');
-        }
-    }
-
-    function logoutUser() {
-        logActivity(`${currentUser?.name} logged out`);
-        currentUser = null;
-        saveData();
-        showAuth();
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-    }
-
-    function updateUserDisplay() {
-        if(currentUser) {
-            document.getElementById('userInfoDisplay').innerHTML = `<div class="user-avatar"><i class="fas fa-user"></i></div><span>${currentUser.name} (${currentUser.role})</span>`;
-            // Show admin panel only for admins
-            const adminBtn = document.querySelector('.admin-only');
-            if(adminBtn) adminBtn.style.display = currentUser.role === 'admin' ? 'inline-block' : 'none';
-        }
     }
 
     function logActivity(message) {
         activityLog.unshift({ message, timestamp: new Date().toISOString() });
         if(activityLog.length > 50) activityLog.pop();
         saveData();
-        updateActivityLog();
     }
 
-    function updateActivityLog() {
-        const container = document.getElementById('activityLog');
-        if(container) {
-            container.innerHTML = '<div style="max-height:300px; overflow-y:auto;">' + activityLog.slice(0,20).map(log => `<div style="padding:8px; border-bottom:1px solid #e2e8f0; font-size:0.7rem;"><strong>${new Date(log.timestamp).toLocaleString()}</strong><br>${escapeHtml(log.message)}</div>`).join('') + '</div>';
+    let selectedLoginRole = 'user';
+    function selectLoginRole(role) {
+        selectedLoginRole = role;
+        document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.role-btn[data-role="${role}"]`).classList.add('active');
+        if(role === 'user') {
+            document.getElementById('userLoginForm').style.display = 'block';
+            document.getElementById('adminLoginForm').style.display = 'none';
+        } else {
+            document.getElementById('userLoginForm').style.display = 'none';
+            document.getElementById('adminLoginForm').style.display = 'block';
         }
     }
 
-    function approveUser(userId) {
-        const pending = pendingUsers.find(u => u.id === userId);
-        if(pending) {
-            users.push({ id: pending.id.replace('PEND_', 'USER_'), name: pending.name, email: pending.email, password: pending.password, role: pending.role, status: 'approved', registeredAt: pending.registeredAt });
-            pendingUsers = pendingUsers.filter(u => u.id !== userId);
-            saveData();
-            updateAll();
-            logActivity(`User ${pending.name} (${pending.email}) was APPROVED by ${currentUser?.name}`);
-            alert(`User ${pending.name} approved successfully!`);
+    function showRegister() { document.getElementById('userLoginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; }
+    function showLoginForm() { document.getElementById('registerForm').style.display = 'none'; document.getElementById('userLoginForm').style.display = 'block'; }
+
+    function registerUser() {
+        const name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirmPassword').value;
+        const zone = document.getElementById('regZone').value;
+        const woreda = document.getElementById('regWoreda').value;
+        
+        if(!name || !email || !password || !zone || !woreda) { alert('Please fill all fields'); return; }
+        if(password !== confirm) { alert('Passwords do not match'); return; }
+        if(users.find(u => u.email === email)) { alert('Email already registered'); return; }
+        
+        const newUser = { id: 'USER_' + Date.now(), name, email, password: btoa(password), role: 'data_collector', zone, woreda, status: 'pending', registeredAt: new Date().toISOString() };
+        users.push(newUser);
+        saveData();
+        logActivity(`New registration request: ${name} (${email}) - Zone: ${zone}, Woreda: ${woreda}`);
+        alert(`Registration submitted! Waiting for admin approval.\n\nYou will be notified when approved.`);
+        showLoginForm();
+        document.getElementById('regName').value = '';
+        document.getElementById('regEmail').value = '';
+        document.getElementById('regPassword').value = '';
+        document.getElementById('regConfirmPassword').value = '';
+        document.getElementById('regZone').value = '';
+        document.getElementById('regWoreda').value = '';
+    }
+
+    function loginUser() {
+        const email = document.getElementById('userEmail').value;
+        const password = document.getElementById('userPassword').value;
+        const user = users.find(u => u.email === email && atob(u.password) === password && u.role === 'data_collector');
+        if(user && user.status === 'approved') {
+            currentUser = user;
+            logActivity(`${user.name} (${user.zone}/${user.woreda}) logged in`);
+            showUserApp();
+        } else if(user && user.status === 'pending') {
+            alert('Your account is pending admin approval.');
+        } else {
+            alert('Invalid email or password');
         }
     }
 
-    function rejectUser(userId) {
-        const pending = pendingUsers.find(u => u.id === userId);
-        if(pending) {
-            pendingUsers = pendingUsers.filter(u => u.id !== userId);
-            saveData();
-            updateAll();
-            logActivity(`User ${pending.name} (${pending.email}) was REJECTED by ${currentUser?.name}`);
-            alert(`User ${pending.name} rejected.`);
+    function loginAdmin() {
+        const email = document.getElementById('adminEmail').value;
+        const password = document.getElementById('adminPassword').value;
+        const admin = users.find(u => u.email === email && atob(u.password) === password && u.role === 'admin');
+        if(admin) {
+            currentUser = admin;
+            logActivity(`Admin ${admin.name} logged in`);
+            showAdminApp();
+        } else {
+            alert('Invalid admin credentials');
         }
     }
 
-    function deleteUser(userId) {
-        if(confirm('Delete this user?')) {
-            const user = users.find(u => u.id === userId);
-            users = users.filter(u => u.id !== userId);
-            saveData();
-            updateAll();
-            logActivity(`User ${user?.name} (${user?.email}) was DELETED by ${currentUser?.name}`);
-            alert('User deleted');
-        }
+    function showUserApp() {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('adminApp').style.display = 'none';
+        document.getElementById('userApp').style.display = 'block';
+        document.getElementById('userLocationDisplay').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${currentUser.zone} - ${currentUser.woreda}`;
+        document.getElementById('userNameDisplay').innerText = currentUser.name;
+        document.getElementById('userStudentZone').value = currentUser.zone;
+        document.getElementById('userStudentWoreda').value = currentUser.woreda;
+        updateUserApp();
     }
 
-    function updateUsersTable() {
-        const tbody = document.getElementById('usersTableBody');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-        // Show pending users first
-        pendingUsers.forEach(u => {
-            tbody.innerHTML += `<tr style="background:#fef3c7;"><td>${escapeHtml(u.name)}</td><td>${escapeHtml(u.email)}</td><td>${u.role}</td><td><span class="level-badge level-2">Pending</span></td><td>${new Date(u.registeredAt).toLocaleDateString()}</td>
-            <td><button class="btn btn-success btn-sm" onclick="approveUser('${u.id}')"><i class="fas fa-check"></i> Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectUser('${u.id}')"><i class="fas fa-times"></i> Reject</button></td></tr>`;
-        });
-        users.forEach(u => {
-            if(u.email !== ADMIN_EMAIL) {
-                tbody.innerHTML += `<tr><td>${escapeHtml(u.name)}</td><td>${escapeHtml(u.email)}</td><td>${u.role}</td><td><span class="level-badge level-4">Approved</span></td><td>${new Date(u.registeredAt).toLocaleDateString()}</td>
-                <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i> Delete</button></td></tr>`;
-            }
-        });
+    function showAdminApp() {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('userApp').style.display = 'none';
+        document.getElementById('adminApp').style.display = 'block';
+        document.getElementById('adminName').innerText = currentUser.name;
+        updateAdminApp();
     }
 
-    // Student Management Functions
+    function logout() {
+        logActivity(`${currentUser?.name} logged out`);
+        currentUser = null;
+        document.getElementById('authSection').style.display = 'block';
+        document.getElementById('adminApp').style.display = 'none';
+        document.getElementById('userApp').style.display = 'none';
+        document.getElementById('userEmail').value = '';
+        document.getElementById('userPassword').value = '';
+        document.getElementById('adminEmail').value = '';
+        document.getElementById('adminPassword').value = '';
+        selectLoginRole('user');
+    }
+
+    // Helper Functions
     function getEnglishLevel(score) {
         if(score === 0) return { name: 'Beginner', class: 'level-1', code: 1 };
         if(score === 1) return { name: 'Alphabet', class: 'level-2', code: 2 };
@@ -426,145 +411,207 @@
         return { name: 'Computed', class: 'level-6', code: 6 };
     }
 
-    function registerStudent() {
+    // ADMIN FUNCTIONS
+    function updateAdminApp() {
+        const approvedUsers = users.filter(u => u.role === 'data_collector');
+        const pendingUsers = approvedUsers.filter(u => u.status === 'pending');
+        document.getElementById('adminTotalUsers').textContent = approvedUsers.length;
+        document.getElementById('adminPendingUsers').textContent = pendingUsers.length;
+        document.getElementById('adminTotalStudents').textContent = students.length;
+        
+        document.getElementById('adminUserStats').innerHTML = `<div class="alert alert-info">Total Data Collectors: ${approvedUsers.length}<br>Approved: ${approvedUsers.filter(u=>u.status==='approved').length}<br>Pending: ${pendingUsers.length}</div>`;
+        document.getElementById('adminSchoolStats').innerHTML = `<div class="alert alert-success">Total Students: ${students.length}<br>Schools: ${[...new Set(students.map(s=>s.schoolName))].length}<br>Woredas: ${[...new Set(students.map(s=>s.woreda))].length}</div>`;
+        document.getElementById('adminActivityLog').innerHTML = '<div style="max-height:300px; overflow-y:auto;">' + activityLog.slice(0,15).map(log => `<div style="padding:5px; border-bottom:1px solid #e2e8f0; font-size:0.7rem;">${new Date(log.timestamp).toLocaleString()}: ${log.message}</div>`).join('') + '</div>';
+        
+        const tbody = document.getElementById('adminUsersTableBody');
+        tbody.innerHTML = '';
+        users.filter(u => u.role === 'data_collector').forEach(u => {
+            tbody.innerHTML += `<tr style="${u.status === 'pending' ? 'background:#fef3c7;' : ''}">
+                <td>${escapeHtml(u.name)}</td><td>${escapeHtml(u.email)}</td><td>${escapeHtml(u.zone)}</td><td>${escapeHtml(u.woreda)}</td>
+                <td>Data Collector</td><td>${u.status === 'approved' ? '<span class="level-badge level-4">Approved</span>' : '<span class="level-badge level-2">Pending</span>'}</td>
+                <td>${new Date(u.registeredAt).toLocaleDateString()}</td>
+                <td>${u.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveUser('${u.id}')"><i class="fas fa-check"></i> Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectUser('${u.id}')"><i class="fas fa-times"></i> Reject</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i> Delete</button>`}</td>
+            </tr>`;
+        });
+    }
+
+    function approveUser(userId) {
+        const user = users.find(u => u.id === userId);
+        if(user) { user.status = 'approved'; saveData(); logActivity(`User ${user.name} (${user.zone}/${user.woreda}) was APPROVED`); updateAdminApp(); alert(`${user.name} approved!`); }
+    }
+
+    function rejectUser(userId) {
+        const user = users.find(u => u.id === userId);
+        if(user) { users = users.filter(u => u.id !== userId); saveData(); logActivity(`User ${user.name} was REJECTED`); updateAdminApp(); alert(`${user.name} rejected.`); }
+    }
+
+    function deleteUser(userId) {
+        if(confirm('Delete this user?')) {
+            const user = users.find(u => u.id === userId);
+            users = users.filter(u => u.id !== userId);
+            saveData();
+            logActivity(`User ${user?.name} was DELETED`);
+            updateAdminApp();
+            alert('User deleted');
+        }
+    }
+
+    function generateAdminReport() {
+        const format = document.getElementById('adminReportFormat').value;
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaRL Admin Report</title><style>body{font-family:Arial;margin:40px;}</style></head><body>
+        <h1>TaRL Department - Admin Report</h1><p>Generated: ${new Date().toLocaleString()}</p>
+        <h2>Users</h2><table border="1"><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Status</th></tr>`;
+        users.filter(u=>u.role==='data_collector').forEach(u => html += `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.zone}</td><td>${u.woreda}</td><td>${u.status}</td></tr>`);
+        html += `</table><h2>Students</h2><table border="1"><tr><th>Name</th><th>School</th><th>Zone</th><th>Woreda</th><th>English</th><th>Oromo</th></tr>`;
+        students.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>${s.zone}</td><td>${s.woreda}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td></tr>`);
+        html += `</table></body></html>`;
+        if(format === 'html') { const w=window.open(); w.document.write(html); w.document.close(); }
+        else { const div=document.createElement('div'); div.innerHTML=html; document.body.appendChild(div); html2pdf().from(div).set({margin:1}).save(); setTimeout(()=>document.body.removeChild(div),1000); }
+    }
+
+    // USER FUNCTIONS (Data Collector - Zone/Woreda Restricted)
+    function getUserStudents() {
+        return students.filter(s => s.zone === currentUser.zone && s.woreda === currentUser.woreda);
+    }
+
+    function registerUserStudent() {
         const learnerId = 'LRN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4).toUpperCase();
-        document.getElementById('learnerId').value = learnerId;
-        const englishScore = (parseInt(document.getElementById('studentEngBeginners').value)||0) + (parseInt(document.getElementById('studentEngAlphabet').value)||0) + 
-                             (parseInt(document.getElementById('studentEngWords').value)||0) + (parseInt(document.getElementById('studentEngSentence').value)||0) + 
-                             (parseInt(document.getElementById('studentEngStory').value)||0);
-        const oromoScore = (parseInt(document.getElementById('studentOromoBeginners').value)||0) + (parseInt(document.getElementById('studentOromoQubee').value)||0) + 
-                           (parseInt(document.getElementById('studentOromoWord').value)||0) + (parseInt(document.getElementById('studentOromoSentence').value)||0) + 
-                           (parseInt(document.getElementById('studentOromoStory').value)||0);
+        document.getElementById('userLearnerId').value = learnerId;
+        const englishScore = (parseInt(document.getElementById('userEngBeginners').value)||0) + (parseInt(document.getElementById('userEngAlphabet').value)||0) + 
+                             (parseInt(document.getElementById('userEngWords').value)||0) + (parseInt(document.getElementById('userEngSentence').value)||0) + 
+                             (parseInt(document.getElementById('userEngStory').value)||0);
+        const oromoScore = (parseInt(document.getElementById('userOromoBeginners').value)||0) + (parseInt(document.getElementById('userOromoQubee').value)||0) + 
+                           (parseInt(document.getElementById('userOromoWord').value)||0) + (parseInt(document.getElementById('userOromoSentence').value)||0) + 
+                           (parseInt(document.getElementById('userOromoStory').value)||0);
         students.push({
-            id: learnerId, zone: document.getElementById('studentZone').value, woreda: document.getElementById('studentWoreda').value,
-            schoolId: document.getElementById('studentSchoolId').value, schoolName: document.getElementById('studentSchoolName').value,
-            name: document.getElementById('studentName').value, sex: document.getElementById('studentSex').value,
-            grade: document.getElementById('studentGrade').value, specialNeeds: document.getElementById('specialNeeds').value,
+            id: learnerId, zone: currentUser.zone, woreda: currentUser.woreda,
+            schoolId: document.getElementById('userStudentSchoolId').value, schoolName: document.getElementById('userStudentSchoolName').value,
+            name: document.getElementById('userStudentName').value, sex: document.getElementById('userStudentSex').value,
+            grade: document.getElementById('userStudentGrade').value, specialNeeds: document.getElementById('userSpecialNeeds').value,
             englishScore: englishScore, oromoScore: oromoScore, englishLevel: getEnglishLevel(englishScore), oromoLevel: getOromoLevel(oromoScore)
         });
         saveData();
-        updateAll();
+        updateUserApp();
         alert(`Student registered! ID: ${learnerId}`);
-        clearStudentForm();
-        logActivity(`${currentUser?.name} registered student: ${document.getElementById('studentName').value}`);
+        logActivity(`${currentUser.name} registered student: ${document.getElementById('userStudentName').value} in ${currentUser.zone}/${currentUser.woreda}`);
+        clearUserStudentForm();
     }
 
-    function clearStudentForm() {
-        ['studentZone','studentWoreda','studentSchoolId','studentSchoolName','studentName','studentEngBeginners','studentEngAlphabet','studentEngWords','studentEngSentence','studentEngStory','studentOromoBeginners','studentOromoQubee','studentOromoWord','studentOromoSentence','studentOromoStory','learnerId'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
+    function clearUserStudentForm() {
+        ['userStudentSchoolId','userStudentSchoolName','userStudentName','userEngBeginners','userEngAlphabet','userEngWords','userEngSentence','userEngStory','userOromoBeginners','userOromoQubee','userOromoWord','userOromoSentence','userOromoStory','userLearnerId'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
     }
 
-    function deleteStudent(id) { if(confirm('Delete student?')) { students = students.filter(s => s.id !== id); saveData(); updateAll(); logActivity(`${currentUser?.name} deleted student`); } }
+    function deleteUserStudent(id) { if(confirm('Delete student?')) { students = students.filter(s => s.id !== id); saveData(); updateUserApp(); logActivity(`${currentUser.name} deleted student`); } }
 
-    function updateStudentTable() {
-        const tbody = document.getElementById('studentTableBody');
-        if(!tbody) return;
-        if(students.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No students registered</td></tr>'; return; }
+    function updateUserApp() {
+        const userStudents = getUserStudents();
+        document.getElementById('userTotalStudents').textContent = userStudents.length;
+        document.getElementById('userTotalSchools').textContent = [...new Set(userStudents.map(s=>s.schoolName))].length;
+        let eng=0,oro=0;
+        userStudents.forEach(s=>{ eng+=s.englishScore; oro+=s.oromoScore; });
+        document.getElementById('userAvgEnglish').textContent = userStudents.length ? ((eng/(userStudents.length*5))*100).toFixed(0) : '0';
+        document.getElementById('userAvgOromo').textContent = userStudents.length ? ((oro/(userStudents.length*5))*100).toFixed(0) : '0';
+        
+        // Student Table
+        const tbody = document.getElementById('userStudentTableBody');
         tbody.innerHTML = '';
-        students.forEach(s => {
+        userStudents.forEach(s => {
             tbody.innerHTML += `<tr><td>${s.id.substring(0,10)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.schoolName)}</td><td>Kutaa ${s.grade}</td>
             <td>${s.englishScore}/5 <span class="level-badge ${s.englishLevel.class}">${s.englishLevel.name}</span></td>
             <td>${s.oromoScore}/5 <span class="level-badge ${s.oromoLevel.class}">${s.oromoLevel.name}</span></td>
-            <td><button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+            <td><button class="btn btn-danger btn-sm" onclick="deleteUserStudent('${s.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
         });
-    }
-
-    function updateWoredaTable() {
-        const tbody = document.getElementById('woredaTableBody');
-        if(!tbody) return;
-        const map = new Map();
-        students.forEach(s => {
+        
+        // Woreda Table
+        const wMap = new Map();
+        userStudents.forEach(s => {
             const key = `${s.zone}|${s.woreda}|${s.grade}`;
-            if(!map.has(key)) map.set(key, { zone: s.zone, woreda: s.woreda, grade: s.grade, count: 0, engTotal: 0, oromoTotal: 0 });
-            const d = map.get(key); d.count++; d.engTotal += s.englishScore; d.oromoTotal += s.oromoScore;
+            if(!wMap.has(key)) wMap.set(key, { zone:s.zone, woreda:s.woreda, grade:s.grade, count:0, eng:0, oro:0 });
+            const d = wMap.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore;
         });
-        if(map.size === 0) { tbody.innerHTML = '<tr><td colspan="6">No data</tr>'; return; }
-        tbody.innerHTML = '';
-        for(let d of map.values()) {
-            tbody.innerHTML += `<tr><td>${escapeHtml(d.zone)}</td><td>${escapeHtml(d.woreda)}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
-            <td>${((d.engTotal/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oromoTotal/(d.count*5))*100).toFixed(1)}%</td></tr>`;
+        const wTbody = document.getElementById('userWoredaTableBody');
+        wTbody.innerHTML = '';
+        for(let d of wMap.values()) {
+            wTbody.innerHTML += `<tr><td>${d.zone}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
+            <td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
         }
+        
+        // School Table
+        const sMap = new Map();
+        userStudents.forEach(s => {
+            const key = `${s.schoolName}|${s.grade}`;
+            if(!sMap.has(key)) sMap.set(key, { school:s.schoolName, woreda:s.woreda, grade:s.grade, count:0, eng:0, oro:0 });
+            const d = sMap.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore;
+        });
+        const sTbody = document.getElementById('userSchoolTableBody');
+        sTbody.innerHTML = '';
+        for(let d of sMap.values()) {
+            sTbody.innerHTML += `<tr><td>${d.school}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
+            <td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
+        }
+        
+        // Charts
+        const grades = ['3','4','5'];
+        const engData = grades.map(g => { const gs = userStudents.filter(s=>s.grade===g); if(gs.length===0) return 0; return (gs.reduce((sum,st)=>sum+st.englishScore,0)/(gs.length*5))*100; });
+        const oromoData = grades.map(g => { const gs = userStudents.filter(s=>s.grade===g); if(gs.length===0) return 0; return (gs.reduce((sum,st)=>sum+st.oromoScore,0)/(gs.length*5))*100; });
+        if(window.userEngChart) window.userEngChart.destroy();
+        window.userEngChart = new Chart(document.getElementById('userEnglishChart'), { type: 'bar', data: { labels: ['Kutaa 3','Kutaa 4','Kutaa 5'], datasets: [{ label: 'English %', data: engData, backgroundColor: '#3b82f6' }] } });
+        if(window.userOromoChart) window.userOromoChart.destroy();
+        window.userOromoChart = new Chart(document.getElementById('userOromoChart'), { type: 'bar', data: { labels: ['Kutaa 3','Kutaa 4','Kutaa 5'], datasets: [{ label: 'Afaan Oromoo %', data: oromoData, backgroundColor: '#10b981' }] } });
+        
+        const levelCounts = [0,0,0,0,0,0];
+        userStudents.forEach(s => levelCounts[s.englishLevel.code-1]++);
+        if(window.userLevelChart) window.userLevelChart.destroy();
+        window.userLevelChart = new Chart(document.getElementById('userLevelChart'), { type: 'pie', data: { labels: ['Beginner','Alphabet','Words','Sentence','Story','Computed'], datasets: [{ data: levelCounts, backgroundColor: ['#ef4444','#f59e0b','#fef3c7','#d1fae5','#dbeafe','#e0e7ff'] }] } });
+        
+        const total = userStudents.length;
+        const males = userStudents.filter(s=>s.sex==='M').length;
+        const females = userStudents.filter(s=>s.sex==='F').length;
+        const avgEng = total ? (userStudents.reduce((s,st)=>s+st.englishScore,0)/total)*20 : 0;
+        const avgOro = total ? (userStudents.reduce((s,st)=>s+st.oromoScore,0)/total)*20 : 0;
+        document.getElementById('userProgramSummary').innerHTML = `<div class="grid-3"><div class="alert alert-info"><strong>My Enrollment</strong><br>Total: ${total}<br>Male: ${males}<br>Female: ${females}</div>
+        <div class="alert alert-success"><strong>My Average Scores</strong><br>English: ${avgEng.toFixed(1)}%<br>Afaan Oromoo: ${avgOro.toFixed(1)}%</div>
+        <div class="alert alert-info"><strong>My Coverage</strong><br>Schools: ${[...new Set(userStudents.map(s=>s.schoolName))].length}<br>Woreda: ${currentUser.woreda}</div></div>`;
     }
 
-    function updateSchoolTable() {
-        const tbody = document.getElementById('schoolTableBody');
-        if(!tbody) return;
-        const map = new Map();
-        students.forEach(s => {
-            const key = `${s.schoolName}|${s.woreda}|${s.grade}`;
-            if(!map.has(key)) map.set(key, { school: s.schoolName, woreda: s.woreda, grade: s.grade, count: 0, engTotal: 0, oromoTotal: 0 });
-            const d = map.get(key); d.count++; d.engTotal += s.englishScore; d.oromoTotal += s.oromoScore;
-        });
-        if(map.size === 0) { tbody.innerHTML = '<tr><td colspan="6">No data</tr>'; return; }
-        tbody.innerHTML = '';
-        for(let d of map.values()) {
-            tbody.innerHTML += `<tr><td>${escapeHtml(d.school)}</td><td>${escapeHtml(d.woreda)}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
-            <td>${((d.engTotal/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oromoTotal/(d.count*5))*100).toFixed(1)}%</td></tr>`;
-        }
-    }
-
-    function updateGrouping() {
-        const grade = document.getElementById('groupGradeSelect')?.value;
-        const container = document.getElementById('groupingDisplay');
-        if(!container) return;
-        const gradeStudents = students.filter(s => s.grade === grade);
+    function updateUserGrouping() {
+        const grade = document.getElementById('userGroupGrade').value;
+        const userStudents = getUserStudents();
+        const gradeStudents = userStudents.filter(s => s.grade === grade);
+        const container = document.getElementById('userGroupingDisplay');
         if(gradeStudents.length === 0) { container.innerHTML = '<div class="alert alert-info">No students for this grade</div>'; return; }
         const groups = {1:[],2:[],3:[],4:[],5:[],6:[]};
         gradeStudents.forEach(s => groups[s.englishLevel.code].push(s.name));
-        let html = '<div class="grid-2"><div><h4>English Grouping</h4>';
+        let html = '<div><h4>English Grouping</h4>';
         const levelNames = ['Beginner','Alphabet','Words','Sentence','Story','Computed'];
         for(let i=1;i<=6;i++) {
             if(groups[i].length > 0) html += `<div class="group-card"><strong>Level ${i}: ${levelNames[i-1]}</strong> (${groups[i].length})<br><small>${groups[i].join(', ')}</small></div>`;
         }
-        html += '</div></div>';
+        html += '</div>';
         container.innerHTML = html;
     }
 
-    function updateDashboardCharts() {
-        const grades = ['3','4','5'];
-        const engData = grades.map(g => { const gs = students.filter(s=>s.grade===g); if(gs.length===0) return 0; return (gs.reduce((s,st)=>s+st.englishScore,0)/(gs.length*5))*100; });
-        const oromoData = grades.map(g => { const gs = students.filter(s=>s.grade===g); if(gs.length===0) return 0; return (gs.reduce((s,st)=>s+st.oromoScore,0)/(gs.length*5))*100; });
-        if(window.engChart) window.engChart.destroy();
-        window.engChart = new Chart(document.getElementById('englishGradeChart'), { type: 'bar', data: { labels: ['Kutaa 3','Kutaa 4','Kutaa 5'], datasets: [{ label: 'English %', data: engData, backgroundColor: '#3b82f6' }] } });
-        if(window.oromoChart) window.oromoChart.destroy();
-        window.oromoChart = new Chart(document.getElementById('oromoGradeChart'), { type: 'bar', data: { labels: ['Kutaa 3','Kutaa 4','Kutaa 5'], datasets: [{ label: 'Afaan Oromoo %', data: oromoData, backgroundColor: '#10b981' }] } });
-        
-        const levelCounts = [0,0,0,0,0,0];
-        students.forEach(s => levelCounts[s.englishLevel.code-1]++);
-        if(window.levelChart) window.levelChart.destroy();
-        window.levelChart = new Chart(document.getElementById('levelDistributionChart'), { type: 'pie', data: { labels: ['Beginner','Alphabet','Words','Sentence','Story','Computed'], datasets: [{ data: levelCounts, backgroundColor: ['#ef4444','#f59e0b','#fef3c7','#d1fae5','#dbeafe','#e0e7ff'] }] } });
-    }
-
-    function updateProgramSummary() {
-        const total = students.length;
-        const males = students.filter(s=>s.sex==='M').length;
-        const females = students.filter(s=>s.sex==='F').length;
-        const avgEng = total ? (students.reduce((s,st)=>s+st.englishScore,0)/total)*20 : 0;
-        const avgOro = total ? (students.reduce((s,st)=>s+st.oromoScore,0)/total)*20 : 0;
-        const container = document.getElementById('programSummary');
-        if(container) container.innerHTML = `<div class="grid-3"><div class="alert alert-info"><strong>Enrollment</strong><br>Total: ${total}<br>Male: ${males}<br>Female: ${females}</div>
-        <div class="alert alert-success"><strong>Average Scores</strong><br>English: ${avgEng.toFixed(1)}%<br>Afaan Oromoo: ${avgOro.toFixed(1)}%</div>
-        <div class="alert alert-info"><strong>Coverage</strong><br>Schools: ${[...new Set(students.map(s=>s.schoolName))].length}<br>Woredas: ${[...new Set(students.map(s=>s.woreda))].length}</div></div>`;
-    }
-
-    function generateReport() {
-        const type = document.getElementById('reportType').value;
-        const format = document.getElementById('reportFormat').value;
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaRL Report</title><style>body{font-family:Arial;margin:40px;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:8px;}</style></head><body><h1>TaRL Program Report</h1><p>Generated: ${new Date().toLocaleString()}</p>`;
+    function generateUserReport() {
+        const type = document.getElementById('userReportType').value;
+        const format = document.getElementById('userReportFormat').value;
+        const userStudents = getUserStudents();
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaRL Report - ${currentUser.name}</title><style>body{font-family:Arial;margin:40px;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:8px;}</style></head><body>
+        <h1>TaRL Program Report</h1><p>Data Collector: ${currentUser.name}<br>Zone: ${currentUser.zone}<br>Woreda: ${currentUser.woreda}<br>Generated: ${new Date().toLocaleString()}</p>`;
         if(type === 'woreda') {
             const map = new Map();
-            students.forEach(s => { const key = `${s.zone}|${s.woreda}|${s.grade}`; if(!map.has(key)) map.set(key, { zone:s.zone, woreda:s.woreda, grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
-            html += `<h2>Woreda Summary</h2><table><th>Zone</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
-            for(let d of map.values()) html += `<tr><td>${d.zone}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
+            userStudents.forEach(s => { const key = `${s.grade}`; if(!map.has(key)) map.set(key, { grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
+            html += `<h2>Woreda Summary (${currentUser.woreda})</h2><table><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
+            for(let d of map.values()) html += `<tr><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
             html += ` licensierad`;
         } else if(type === 'school') {
             const map = new Map();
-            students.forEach(s => { const key = `${s.schoolName}|${s.grade}`; if(!map.has(key)) map.set(key, { school:s.schoolName, woreda:s.woreda, grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
-            html += `<h2>School Summary</h2><tr><th>School</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
-            for(let d of map.values()) html += `<tr><td>${d.school}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
+            userStudents.forEach(s => { const key = `${s.schoolName}|${s.grade}`; if(!map.has(key)) map.set(key, { school:s.schoolName, grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
+            html += `<h2>School Summary</h2><tr><th>School</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
+            for(let d of map.values()) html += `<tr><td>${d.school}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
             html += `</table>`;
         } else {
             html += `<h2>Student Roster</h2><table><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th>`;
-            students.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td></tr>`);
+            userStudents.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td></tr>`);
             html += `</table>`;
         }
         html += `</body></html>`;
@@ -572,41 +619,8 @@
         else { const div=document.createElement('div'); div.innerHTML=html; document.body.appendChild(div); html2pdf().from(div).set({margin:1}).save(); setTimeout(()=>document.body.removeChild(div),1000); }
     }
 
-    function updateAll() {
-        updateStudentTable();
-        updateWoredaTable();
-        updateSchoolTable();
-        updateUsersTable();
-        updateActivityLog();
-        updateDashboardCharts();
-        updateProgramSummary();
-        updateStats();
-    }
-
-    function updateStats() {
-        document.getElementById('totalStudents').textContent = students.length;
-        document.getElementById('totalSchools').textContent = [...new Set(students.map(s=>s.schoolName))].length;
-        let eng=0,oro=0;
-        students.forEach(s=>{ eng+=s.englishScore; oro+=s.oromoScore; });
-        document.getElementById('avgEnglish').textContent = students.length ? ((eng/(students.length*5))*100).toFixed(0) : '0';
-        document.getElementById('avgOromo').textContent = students.length ? ((oro/(students.length*5))*100).toFixed(0) : '0';
-    }
-
+    function updateAll() { /* placeholder */ }
     function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
-
-    // Check URL for approval links (simulated)
-    function checkUrlForApproval() {
-        const params = new URLSearchParams(window.location.search);
-        const userId = params.get('user');
-        const action = params.get('action');
-        if(userId && action === 'approve') {
-            approveUser(userId);
-            window.history.replaceState({}, document.title, window.location.pathname);
-        } else if(userId && action === 'reject') {
-            rejectUser(userId);
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }
 
     // Navigation
     document.addEventListener('click', function(e) {
@@ -620,7 +634,7 @@
     });
 
     loadData();
-    checkUrlForApproval();
+    selectLoginRole('user');
 </script>
 </body>
 </html>
