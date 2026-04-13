@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Barumsa Global AI Academy | Microsoft-Powered Learning | Afaan Oromo & English</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* Payment Overlay (simplified for brevity, but functional) */
+        .payment-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        .payment-card {
+            background: white;
+            border-radius: 40px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .payment-card input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 30px; border: 1px solid #ccc; }
+        .payment-card button { background: #0078d4; color: white; border: none; padding: 12px; border-radius: 30px; width: 100%; cursor: pointer; margin-top: 10px; }
+        .telebirr-info { background: #fef3c7; border-radius: 20px; padding: 12px; margin: 15px 0; }
+
+        /* Main Platform */
+        .main-platform { display: none; }
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo { font-size: 1.6rem; font-weight: 800; color: #0078d4; }
+        .user-info { display: flex; align-items: center; gap: 15px; background: #f0f2f5; padding: 6px 16px; border-radius: 40px; }
+        .points { background: #ffb347; padding: 4px 12px; border-radius: 20px; color: white; font-weight: bold; }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #0078d4, #00a4ef);
+            color: white;
+            padding: 40px 24px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 2.2rem; margin-bottom: 10px; }
+        .search-bar { max-width: 500px; margin: 20px auto; display: flex; gap: 10px; }
+        .search-bar input { flex: 1; padding: 12px 20px; border-radius: 40px; border: none; }
+        .search-bar button { background: white; color: #0078d4; border: none; padding: 12px 24px; border-radius: 40px; cursor: pointer; }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            backdrop-filter: blur(4px);
+        }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #0078d4; }
+
+        /* AI Chat */
+        .ai-chat {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 24px;
+        }
+        .chat-card {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .chat-header {
+            background: #0078d4;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-messages {
+            height: 280px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .message { margin-bottom: 12px; display: flex; }
+        .message.user { justify-content: flex-end; }
+        .message-content { max-width: 75%; padding: 10px 16px; border-radius: 20px; font-size: 0.9rem; }
+        .message.ai .message-content { background: #eef2ff; color: #1e293b; }
+        .message.user .message-content { background: #0078d4; color: white; }
+        .chat-input { display: flex; padding: 15px; gap: 10px; border-top: 1px solid #e2e8f0; }
+        .chat-input input { flex: 1; padding: 12px; border-radius: 40px; border: 1px solid #cbd5e1; }
+        .chat-input button { background: #0078d4; color: white; border: none; padding: 12px 24px; border-radius: 40px; cursor: pointer; }
+
+        /* Category Tabs */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .tab {
+            background: rgba(255,255,255,0.9);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab.active { background: #0078d4; color: white; }
+
+        /* Resource Grid */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .resource-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .resource-card:hover { transform: translateY(-4px); }
+        .card-thumb { height: 120px; background: linear-gradient(135deg, #0078d4, #00a4ef); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white; }
+        .card-content { padding: 16px; }
+        .card-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 6px; }
+
+        /* Global Sections */
+        .global-section {
+            max-width: 1400px;
+            margin: 50px auto;
+            padding: 0 24px;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 24px;
+            color: white;
+        }
+        .global-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .global-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 24px;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            transition: transform 0.2s;
+        }
+        .global-card:hover { transform: translateY(-5px); background: white; }
+        .global-card h3 { color: #0078d4; margin-bottom: 8px; }
+        .global-card a { color: #1e293b; text-decoration: none; }
+        .global-card a:hover { text-decoration: underline; }
+
+        .footer {
+            background: #0f172a;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.5rem; }
+            .resource-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Payment Overlay (simplified) -->
+    <div id="paymentOverlay" class="payment-overlay">
+        <div class="payment-card">
+            <h2>🌍 Barumsa Global AI Academy</h2>
+            <p>Microsoft-Powered Learning | Afaan Oromo & English</p>
+            <div class="telebirr-info">
+                <p>💳 Telebirr: <strong>+251 917106325</strong></p>
+                <p>Send 10 Birr with your email as reference</p>
+            </div>
+            <input type="email" id="userEmail" placeholder="Your Email">
+            <input type="tel" id="userPhone" placeholder="Phone Number">
+            <input type="text" id="transactionId" placeholder="Transaction ID">
+            <button onclick="verifyAccess()">🚀 Access Global Learning</button>
+            <div id="paymentMsg" style="margin-top:10px; color:red;"></div>
+            <p style="font-size:0.7rem; margin-top:15px;">Admin: mohammedscho2023@gmail.com | 📞 +251 917106325</p>
+        </div>
+    </div>
+
+    <!-- Main Platform -->
+    <div id="mainPlatform" class="main-platform">
+        <div class="navbar">
+            <div class="logo"><i class="fab fa-microsoft"></i> Barumsa Global AI</div>
+            <div class="user-info">
+                <span id="userName">Learner</span>
+                <span class="points" id="pointsBadge">⭐ 0</span>
+            </div>
+        </div>
+
+        <div class="hero">
+            <h1>🎓 AI-Powered Global Learning Platform</h1>
+            <p>Learn Afaan Oromo & English with Microsoft AI, UNESCO Research & 21st Century Skills</p>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search lessons, research, projects...">
+                <button onclick="searchResources()"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card"><div class="stat-value" id="lessonCount">100+</div><div>AI Lessons</div></div>
+            <div class="stat-card"><div class="stat-value" id="globalResourcesCount">50+</div><div>Global Resources</div></div>
+            <div class="stat-card"><div class="stat-value" id="pointsDisplay">0</div><div>Learning Points</div></div>
+        </div>
+
+        <!-- AI Chat Section -->
+        <div class="ai-chat">
+            <div class="chat-card">
+                <div class="chat-header">
+                    <i class="fab fa-microsoft fa-2x"></i>
+                    <div><strong>🤖 Microsoft AI Tutor</strong><br><small>Powered by Azure AI | Research-Based Pedagogy</small></div>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai">
+                        <div class="message-content">
+                            🌍 Welcome to the Global AI Academy!<br>
+                            I'm your AI tutor, integrating:<br>
+                            • Microsoft Education Tools<br>
+                            • UNESCO & OECD Research<br>
+                            • 21st Century Skills Framework<br>
+                            • Project-Based Learning<br><br>
+                            Ask me about Afaan Oromo, English, or global teaching methods!
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Ask about language, research, or projects..." onkeypress="handleChatKey(event)">
+                    <button onclick="sendChat()"><i class="fas fa-paper-plane"></i> Ask AI</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="tabs">
+            <div class="tab active" onclick="filterCategory('all')">📚 All Resources</div>
+            <div class="tab" onclick="filterCategory('lessons')">🎓 Lessons</div>
+            <div class="tab" onclick="filterCategory('projects')">🚀 Projects</div>
+            <div class="tab" onclick="filterCategory('research')">📊 Research</div>
+            <div class="tab" onclick="filterCategory('microsoft')">💡 Microsoft Tools</div>
+            <div class="tab" onclick="filterCategory('global')">🌐 Global Partners</div>
+        </div>
+
+        <div class="resource-grid" id="resourcesGrid"></div>
+
+        <!-- Global Teaching & Learning Section -->
+        <div class="global-section">
+            <div class="section-title">🌍 Global Teaching & Learning Resources</div>
+            <div class="global-grid" id="globalResourcesGrid"></div>
+        </div>
+
+        <!-- Microsoft Education Tools Section -->
+        <div class="global-section">
+            <div class="section-title">💡 Microsoft Education Tools & AI</div>
+            <div class="global-grid" id="microsoftGrid"></div>
+        </div>
+
+        <!-- Research & Projects Section -->
+        <div class="global-section">
+            <div class="section-title">📊 Research-Based Pedagogy & Projects</div>
+            <div class="global-grid" id="researchGrid"></div>
+        </div>
+
+        <div class="footer">
+            <p>Barumsa Global AI Academy | Powered by Microsoft AI | Aligned with UNESCO SDG 4 | Research-Based Learning</p>
+            <p>📧 mohammedscho2023@gmail.com | 📞 +251 917106325</p>
+        </div>
+    </div>
+
+    <!-- Modal for lesson details -->
+    <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2001; justify-content:center; align-items:center;">
+        <div style="background:white; border-radius:32px; max-width:500px; width:90%; padding:24px;">
+            <h3 id="modalTitle"></h3>
+            <div id="modalBody"></div>
+            <button onclick="closeModal()" style="margin-top:20px; padding:10px 20px; background:#0078d4; color:white; border:none; border-radius:40px;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // ======================= DATABASE OF RESOURCES =======================
+        const lessons = [
+            { id: 1, title: "Afaan Oromo Greetings", eng: "Hello, How are you?", oromo: "Asham, Akkam?", icon: "👋", desc: "Learn basic greetings with AI pronunciation", type: "lessons" },
+            { id: 2, title: "Numbers 1-20", eng: "One to Twenty", oromo: "Tokko hanga Digdama", icon: "🔢", desc: "Count with interactive exercises", type: "lessons" },
+            { id: 3, title: "Family Vocabulary", eng: "Family Members", oromo: "Maatii", icon: "👨‍👩‍👧", desc: "Learn family terms", type: "lessons" },
+            { id: 4, title: "Colors & Shapes", eng: "Colors & Shapes", oromo: "Halluuwwan fi Bifaa", icon: "🎨", desc: "Colorful learning", type: "lessons" }
+        ];
+
+        const projects = [
+            { name: "Create a Bilingual Storybook", desc: "Use AI to write a story in Afaan Oromo and English", icon: "📖", url: "#", type: "projects" },
+            { name: "Community Language Map", desc: "Map where Afaan Oromo is spoken using Microsoft Azure Maps", icon: "🗺️", url: "https://azure.microsoft.com/en-us/services/azure-maps/", type: "projects" },
+            { name: "AI-Powered Pronunciation App", desc: "Build with Microsoft Cognitive Services", icon: "🗣️", url: "https://azure.microsoft.com/en-us/services/cognitive-services/speech-to-text/", type: "projects" }
+        ];
+
+        const research = [
+            { name: "UNESCO Inclusive Curriculum Guidelines", desc: "Research on mother-tongue education", url: "https://www.unesco.org/en/curriculum", icon: "🏛️", type: "research" },
+            { name: "OECD Education 2030 Framework", desc: "Future of education", url: "https://www.oecd.org/education/2030-project/", icon: "📊", type: "research" },
+            { name: "Bloom's Taxonomy for Language Learning", desc: "Cognitive domain applied", url: "https://cft.vanderbilt.edu/guides-sub-pages/blooms-taxonomy/", icon: "🧠", type: "research" },
+            { name: "INEE Minimum Standards", desc: "Education in emergencies", url: "https://inee.org/standards", icon: "🛡️", type: "research" }
+        ];
+
+        const microsoftTools = [
+            { name: "Microsoft Azure AI (Speech, Translator)", desc: "Real-time translation & pronunciation", url: "https://azure.microsoft.com/en-us/products/ai-services/", icon: "☁️", type: "microsoft" },
+            { name: "Microsoft Learn - AI Fundamentals", desc: "Free courses on AI in education", url: "https://learn.microsoft.com/en-us/training/", icon: "📘", type: "microsoft" },
+            { name: "Minecraft Education", desc: "Game-based learning with Afaan Oromo possibilities", url: "https://education.minecraft.net/", icon: "⛏️", type: "microsoft" },
+            { name: "Microsoft Teams for Education", desc: "Collaborative classrooms", url: "https://www.microsoft.com/en-us/education/products/teams", icon: "👥", type: "microsoft" },
+            { name: "Reading Progress & Coach", desc: "AI-assisted reading fluency", url: "https://www.microsoft.com/en-us/education/products/teams/reading-progress", icon: "📖", type: "microsoft" }
+        ];
+
+        const globalPartners = [
+            { name: "UNESCO", desc: "Global education leadership", url: "https://www.unesco.org/en/education", icon: "🏛️", type: "global" },
+            { name: "World Bank Education", desc: "Research & policy", url: "https://www.worldbank.org/en/topic/education", icon: "🌍", type: "global" },
+            { name: "Global Partnership for Education", desc: "Funding & partnerships", url: "https://www.globalpartnership.org/", icon: "🤝", type: "global" },
+            { name: "African Union CESA", desc: "Continental education strategy", url: "https://au.int/en/cesa", icon: "🌍", type: "global" },
+            { name: "Kolibri by Learning Equality", desc: "Offline learning platform", url: "https://learningequality.org/kolibri/", icon: "📱", type: "global" }
+        ];
+
+        // Combine all resources
+        let allResources = [...lessons, ...projects, ...research, ...microsoftTools, ...globalPartners];
+
+        // User & Points System
+        const ADMIN_EMAIL = "mohammedscho2023@gmail.com";
+        let authorizedUsers = [];
+        let currentUser = null;
+        let points = 0;
+        let completedLessons = JSON.parse(localStorage.getItem('global_completed') || '[]');
+
+        function loadUsers() {
+            const stored = localStorage.getItem('global_users');
+            if (stored) { try { authorizedUsers = JSON.parse(stored); } catch(e) { authorizedUsers = []; } }
+            if (!authorizedUsers.length) {
+                authorizedUsers = [{ email: ADMIN_EMAIL, phone: "0917106325", isAdmin: true, points: 10000 }];
+                saveUsers();
+            }
+        }
+        function saveUsers() { localStorage.setItem('global_users', JSON.stringify(authorizedUsers)); }
+
+        function verifyAccess() {
+            const email = document.getElementById('userEmail').value.trim();
+            const phone = document.getElementById('userPhone').value.trim();
+            const transactionId = document.getElementById('transactionId').value.trim();
+
+            if (!email || !phone) { showMsg('Please enter email and phone', 'red'); return; }
+            if (email === ADMIN_EMAIL) {
+                currentUser = { email, phone, isAdmin: true, points: 5000 };
+                localStorage.setItem('global_current', JSON.stringify(currentUser));
+                grantAccess();
+                showMsg('Admin access granted', 'green');
+                return;
+            }
+            const existing = authorizedUsers.find(u => u.email === email || u.phone === phone);
+            if (existing) {
+                currentUser = existing;
+                localStorage.setItem('global_current', JSON.stringify(currentUser));
+                grantAccess();
+                showMsg('Welcome back!', 'green');
+                return;
+            }
+            if (transactionId && transactionId.length >= 4) {
+                const newUser = { email, phone, isAdmin: false, date: new Date().toISOString(), points: 100 };
+                authorizedUsers.push(newUser);
+                saveUsers();
+                currentUser = newUser;
+                localStorage.setItem('global_current', JSON.stringify(currentUser));
+                grantAccess();
+                showMsg('✅ Access granted! Welcome to Global AI Academy!', 'green');
+            } else {
+                showMsg('❌ Send 10 ETB to +251917106325 via Telebirr and enter Transaction ID', 'red');
+            }
+        }
+        function showMsg(msg, color) { let d = document.getElementById('paymentMsg'); d.textContent = msg; d.style.color = color; setTimeout(() => d.textContent = '', 4000); }
+
+        function grantAccess() {
+            document.getElementById('paymentOverlay').style.display = 'none';
+            document.getElementById('mainPlatform').style.display = 'block';
+            points = currentUser.points || 0;
+            document.getElementById('userName').innerHTML = currentUser.email.split('@')[0];
+            document.getElementById('pointsDisplay').innerHTML = points;
+            document.getElementById('pointsBadge').innerHTML = `⭐ ${points}`;
+            renderResources();
+            renderGlobalSections();
+            addAIMessage("🌍 Welcome to the Global AI Academy! I'm your AI tutor, powered by Microsoft Azure. I can help you learn Afaan Oromo, English, explore global teaching resources, and guide you through research-based projects. What would you like to explore today?");
+        }
+
+        // AI Chat Functions
+        function addMessage(text, isUser) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${isUser ? 'user' : 'ai'}`;
+            div.innerHTML = `<div class="message-content">${text}</div>`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        function addAIMessage(text) { addMessage(text, false); }
+
+        function getAIResponse(msg) {
+            const lower = msg.toLowerCase();
+            if (lower.includes('hello') || lower.includes('asham')) return "👋 Asham! That's 'Hello' in Afaan Oromo. Would you like to learn more greetings?";
+            if (lower.includes('thank')) return "🙏 Galatoomi means 'Thank you'. You're welcome!";
+            if (lower.includes('family')) return "👨‍👩‍👧 Family: Abbaa (father), Haadha (mother), Obboleessa (brother), Obboleettii (sister). Would you like a quiz?";
+            if (lower.includes('number')) return "🔢 Numbers 1-10: Tokko, Lama, Sadii, Afur, Shan, Ja'a, Torba, Saddet, Sagal, Kudhan.";
+            if (lower.includes('microsoft')) return "💡 Microsoft Education offers Azure AI, Minecraft Education, and Microsoft Learn. Check the Microsoft Tools section!";
+            if (lower.includes('research')) return "📊 Our platform integrates UNESCO, OECD, and INEE research. Visit the Research section for links.";
+            if (lower.includes('project')) return "🚀 Check out the Projects tab! You can create bilingual stories, language maps, or AI pronunciation apps.";
+            if (lower.includes('global')) return "🌍 We partner with UNESCO, World Bank, GPE, and Kolibri to bring you global best practices.";
+            return "🤖 I'm here to help! You can ask me about Afaan Oromo vocabulary, Microsoft education tools, global research, or project ideas. What would you like to know?";
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            addMessage(msg, true);
+            input.value = '';
+            setTimeout(() => {
+                const reply = getAIResponse(msg);
+                addAIMessage(reply);
+                addPoints(2);
+            }, 400);
+        }
+        function handleChatKey(e) { if (e.key === 'Enter') sendChat(); }
+
+        // Resource Rendering
+        let currentCategory = 'all';
+        function renderResources() {
+            let filtered = allResources;
+            if (currentCategory !== 'all') filtered = allResources.filter(r => r.type === currentCategory);
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            if (searchTerm) filtered = filtered.filter(r => (r.title || r.name || '').toLowerCase().includes(searchTerm));
+
+            const grid = document.getElementById('resourcesGrid');
+            grid.innerHTML = filtered.map(r => {
+                const title = r.title || r.name;
+                const desc = r.desc || (r.oromo ? `${r.eng} → ${r.oromo}` : 'Explore');
+                const icon = r.icon || '📘';
+                if (r.id) { // lesson
+                    return `<div class="resource-card" onclick="openLesson(${r.id})">
+                        <div class="card-thumb">${icon}</div>
+                        <div class="card-content"><div class="card-title">${title}</div><div>${desc}</div></div>
+                    </div>`;
+                } else {
+                    return `<a href="${r.url}" target="_blank" class="resource-card">
+                        <div class="card-thumb">${icon}</div>
+                        <div class="card-content"><div class="card-title">${title}</div><div>${desc}</div></div>
+                    </a>`;
+                }
+            }).join('');
+        }
+
+        function openLesson(id) {
+            const lesson = lessons.find(l => l.id === id);
+            if (lesson) {
+                document.getElementById('modalTitle').innerHTML = lesson.title;
+                document.getElementById('modalBody').innerHTML = `
+                    <div><strong>🇺🇸 English:</strong> ${lesson.eng}</div>
+                    <div><strong>🇪🇹 Afaan Oromo:</strong> ${lesson.oromo}</div>
+                    <div>${lesson.desc}</div>
+                    <button onclick="completeLesson(${id})" style="background:#0078d4; color:white; border:none; padding:8px 16px; border-radius:30px; margin-top:15px;">✅ Complete (+10 points)</button>
+                    <button onclick="speakText('${lesson.oromo}')" style="background:#f0f2f5; border:none; padding:8px 16px; border-radius:30px; margin-left:10px;">🔊 Listen</button>
+                `;
+                document.getElementById('modal').style.display = 'flex';
+            }
+        }
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'om-ET';
+                window.speechSynthesis.speak(utterance);
+                addPoints(2);
+            } else alert('Speech synthesis not supported');
+        }
+        function completeLesson(id) {
+            if (!completedLessons.includes(id)) {
+                completedLessons.push(id);
+                localStorage.setItem('global_completed', JSON.stringify(completedLessons));
+                addPoints(10);
+                alert('🎉 Lesson completed! +10 points');
+                closeModal();
+                renderResources();
+            } else alert('You already completed this lesson!');
+        }
+        function addPoints(amt) { points += amt; document.getElementById('pointsDisplay').innerHTML = points; document.getElementById('pointsBadge').innerHTML = `⭐ ${points}`; if(currentUser) { currentUser.points = points; localStorage.setItem('global_current', JSON.stringify(currentUser)); } }
+
+        function renderGlobalSections() {
+            const globalGrid = document.getElementById('globalResourcesGrid');
+            globalGrid.innerHTML = globalPartners.map(p => `
+                <div class="global-card"><a href="${p.url}" target="_blank"><h3><i class="fas ${p.icon === '🏛️' ? 'fa-university' : 'fa-globe'}"></i> ${p.name}</h3><p>${p.desc}</p></a></div>
+            `).join('');
+            const microsoftGrid = document.getElementById('microsoftGrid');
+            microsoftGrid.innerHTML = microsoftTools.map(m => `
+                <div class="global-card"><a href="${m.url}" target="_blank"><h3><i class="fab fa-microsoft"></i> ${m.name}</h3><p>${m.desc}</p></a></div>
+            `).join('');
+            const researchGrid = document.getElementById('researchGrid');
+            researchGrid.innerHTML = research.map(r => `
+                <div class="global-card"><a href="${r.url}" target="_blank"><h3><i class="fas ${r.icon === '🧠' ? 'fa-brain' : 'fa-chart-line'}"></i> ${r.name}</h3><p>${r.desc}</p></a></div>
+            `).join('');
+        }
+
+        function filterCategory(cat) { currentCategory = cat; renderResources(); document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); if(event.target) event.target.classList.add('active'); }
+        function searchResources() { renderResources(); }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+        loadUsers();
+        const saved = localStorage.getItem('global_current');
+        if (saved) { currentUser = JSON.parse(saved); if (currentUser) grantAccess(); }
+    </script>
+</body>
+</html>
