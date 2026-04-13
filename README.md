@@ -3,822 +3,564 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RB‑PMS Pro | Results‑Based Project Management System</title>
-    <!-- Fonts & Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
+    <title>TaRL Department | English & Afaan Oromoo | Teaching at the Right Level</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #0a4a6b;
-            --primary-light: #1a6a94;
-            --secondary: #2a9d8f;
-            --accent: #e9c46a;
-            --bg-light: #f4f9ff;
-            --border-light: #d9e6f2;
-            --text-dark: #0b2a40;
-            --text-muted: #4a6f89;
-            --success: #2a9d8f;
-            --warning: #e9c46a;
-            --danger: #e76f51;
-            --card-shadow: 0 10px 30px -8px rgba(0,35,70,0.08);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(145deg, #edf3f9 0%, #f7fbfe 100%);
-            color: var(--text-dark);
-            padding: 28px 32px;
-            line-height: 1.5;
-            min-height: 100vh;
-        }
-
-        .app-container {
-            max-width: 1920px;
-            margin: 0 auto;
-        }
-
-        /* ===== HEADER ===== */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .brand-section h1 {
-            font-weight: 800;
-            font-size: 2.2rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 8px;
-        }
-
-        .brand-section h1 i {
-            background: var(--primary);
-            -webkit-text-fill-color: white;
-            padding: 14px;
-            border-radius: 18px;
-            font-size: 1.6rem;
-        }
-
-        .version-tag {
-            background: var(--primary-light);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .project-setup-card {
-            background: white;
-            padding: 20px 28px;
-            border-radius: 30px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border-light);
-            min-width: 400px;
-        }
-
-        .setup-title {
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .setup-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .setup-select, .setup-input {
-            padding: 12px 18px;
-            border-radius: 40px;
-            border: 1.5px solid var(--border-light);
-            font-family: 'Inter', sans-serif;
-            background: #fafcff;
-            font-size: 0.9rem;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(10,74,107,0.2);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-light);
-            transform: translateY(-2px);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid var(--border-light);
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: 500;
-            cursor: pointer;
-            color: var(--text-dark);
-        }
-
-        /* ===== FRAMEWORK BADGES ===== */
-        .framework-cloud {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px 20px;
-            padding: 20px 0;
-            margin: 20px 0;
-            border-top: 2px solid rgba(10,74,107,0.1);
-            border-bottom: 2px solid rgba(10,74,107,0.1);
-        }
-
-        .fw-badge {
-            background: white;
-            padding: 10px 22px;
-            border-radius: 40px;
-            font-weight: 600;
-            color: var(--primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            border: 1px solid var(--border-light);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .fw-badge i {
-            color: var(--primary-light);
-        }
-
-        /* ===== CYCLE VISUALIZATION ===== */
-        .cycle-wrapper {
-            background: white;
-            border-radius: 50px;
-            padding: 32px 20px;
-            margin: 30px 0;
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border-light);
-        }
-
-        .cycle-steps {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .cycle-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            min-width: 95px;
-        }
-
-        .cycle-icon {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            margin-bottom: 12px;
-            box-shadow: 0 8px 16px rgba(10,74,107,0.15);
-        }
-
-        .cycle-label {
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .cycle-arrow {
-            color: var(--text-muted);
-            font-size: 1.8rem;
-            opacity: 0.5;
-        }
-
-        /* ===== KPI DASHBOARD ===== */
-        .kpi-dashboard {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .kpi-panel {
-            background: white;
-            border-radius: 28px;
-            padding: 26px 24px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border-light);
-            transition: transform 0.2s;
-        }
-
-        .kpi-panel:hover {
-            transform: translateY(-4px);
-        }
-
-        .kpi-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .kpi-title {
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-        }
-
-        .kpi-icon {
-            background: var(--bg-light);
-            padding: 8px;
-            border-radius: 14px;
-            color: var(--primary);
-        }
-
-        .kpi-main-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-
-        .kpi-trend {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--success);
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .progress-container {
-            height: 10px;
-            background: var(--bg-light);
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 10px;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: 20px;
-            transition: width 0.3s;
-        }
-
-        /* ===== MODULE TABS ===== */
-        .module-nav {
-            display: flex;
-            gap: 6px;
-            margin: 32px 0 0;
-            border-bottom: 2px solid var(--border-light);
-        }
-
-        .nav-tab {
-            background: transparent;
-            border: none;
-            padding: 18px 32px;
-            font-weight: 700;
-            color: var(--text-muted);
-            border-radius: 30px 30px 0 0;
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transition: all 0.2s;
-        }
-
-        .nav-tab i {
-            font-size: 1.3rem;
-        }
-
-        .nav-tab.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 -6px 14px rgba(0,0,0,0.02);
-            border-bottom: 4px solid var(--primary);
-        }
-
-        .nav-tab:hover:not(.active) {
-            color: var(--primary-light);
-            background: rgba(255,255,255,0.5);
-        }
-
-        .module-panel {
-            display: none;
-            background: white;
-            border-radius: 0 28px 28px 28px;
-            padding: 36px 34px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border-light);
-            margin-bottom: 30px;
-        }
-
-        .module-panel.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== PANEL LAYOUT ===== */
-        .panel-grid-2 {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 34px;
-        }
-
-        .info-block {
-            background: var(--bg-light);
-            border-radius: 24px;
-            padding: 26px;
-            border: 1px solid var(--border-light);
-        }
-
-        .section-title {
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.3rem;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        .data-table th {
-            background: var(--primary);
-            color: white;
-            padding: 16px 14px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .data-table td {
-            padding: 16px 14px;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .data-table tr:hover td {
-            background: rgba(26,106,148,0.03);
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 12px;
-        }
-
-        .status-dot.green { background: var(--success); box-shadow: 0 0 8px rgba(42,157,143,0.4); }
-        .status-dot.amber { background: var(--warning); }
-        .status-dot.red { background: var(--danger); }
-
-        .editable-field {
-            border-bottom: 1px dashed var(--primary-light);
-            cursor: pointer;
-        }
-
-        .chart-container {
-            margin-top: 24px;
-            padding: 20px;
-            background: white;
-            border-radius: 20px;
-        }
-
-        /* ===== FOOTER ===== */
-        .system-footer {
-            margin-top: 40px;
-            padding: 28px 34px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: 40px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 30px;
-        }
-
-        .footer-links span {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); min-height: 100vh; padding: 20px; }
+        .dashboard-container { max-width: 1600px; margin: 0 auto; }
+        .header { background: rgba(255,255,255,0.95); border-radius: 24px; padding: 20px 30px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .logo h1 { font-size: 1.6rem; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo p { color: #64748b; font-size: 0.75rem; }
+        .stats-badge { display: flex; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #f8fafc; padding: 8px 15px; border-radius: 14px; text-align: center; border: 1px solid #e2e8f0; }
+        .badge .number { font-size: 1.3rem; font-weight: bold; color: #2563eb; }
+        .badge .label { font-size: 0.65rem; color: #64748b; }
+        .nav-tabs { display: flex; gap: 5px; background: rgba(255,255,255,0.95); border-radius: 50px; padding: 5px 15px; margin-bottom: 25px; flex-wrap: wrap; overflow-x: auto; }
+        .nav-btn { padding: 8px 18px; border: none; background: transparent; font-size: 0.8rem; font-weight: 600; cursor: pointer; border-radius: 40px; transition: all 0.3s; color: #475569; white-space: nowrap; }
+        .nav-btn:hover { background: #e2e8f0; }
+        .nav-btn.active { background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; }
+        .section { display: none; animation: fadeIn 0.3s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: #1e293b; border-left: 4px solid #2563eb; padding-left: 12px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.75rem; color: #334155; }
+        input, select, textarea { width: 100%; padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 0.8rem; font-family: inherit; }
+        input:focus, select:focus { outline: none; border-color: #2563eb; }
+        .btn { padding: 8px 16px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
+        .btn-danger { background: #fee2e2; color: #dc2626; }
+        .btn-success { background: #d1fae5; color: #059669; }
+        .btn-sm { padding: 4px 8px; font-size: 0.65rem; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; overflow-x: auto; display: block; }
+        .data-table th, .data-table td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .data-table th { background: #f8fafc; font-weight: 700; color: #1e293b; position: sticky; top: 0; }
+        .data-table tr:hover { background: #f8fafc; }
+        .progress-bar-container { background: #e2e8f0; border-radius: 20px; overflow: hidden; height: 6px; }
+        .progress-bar { height: 100%; border-radius: 20px; transition: width 0.5s ease; }
+        .progress-high { background: #10b981; }
+        .progress-medium { background: #f59e0b; }
+        .progress-low { background: #ef4444; }
+        .alert { padding: 10px 14px; border-radius: 10px; margin-bottom: 15px; font-size: 0.75rem; }
+        .alert-info { background: #dbeafe; color: #1e40af; border-left: 4px solid #2563eb; }
+        .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .formula-box { background: #fef3c7; padding: 8px; border-radius: 8px; font-family: monospace; font-size: 0.7rem; margin-top: 8px; }
+        .footer { text-align: center; padding: 20px; color: rgba(255,255,255,0.5); font-size: 0.7rem; }
+        .literacy-level { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
+        .level-1 { background: #fee2e2; color: #991b1b; }
+        .level-2 { background: #fed7aa; color: #9a3412; }
+        .level-3 { background: #fef3c7; color: #92400e; }
+        .level-4 { background: #d1fae5; color: #065f46; }
+        .level-5 { background: #dbeafe; color: #1e40af; }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .data-table { font-size: 0.55rem; } }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <!-- HEADER -->
-    <div class="app-header">
-        <div class="brand-section">
-            <h1>
-                <i class="fas fa-cubes"></i>
-                RB‑PMS Professional
-                <span class="version-tag">v3.0 · PM4DEV · UNICEF · GPE</span>
-            </h1>
-            <p style="color: var(--text-muted); margin-top: 8px; font-weight: 500;">
-                <i class="fas fa-arrows-spin"></i> Results‑Based · Fully Customizable · MEAL Integrated
-            </p>
+<div class="dashboard-container">
+    <div class="header">
+        <div class="logo"><h1><i class="fas fa-language"></i> TaRL Department</h1><p>Teaching at the Right Level | English & Afaan Oromoo | 5 Components Each</p></div>
+        <div class="stats-badge">
+            <div class="badge"><div class="number" id="totalStudents">0</div><div class="label">Total Students</div></div>
+            <div class="badge"><div class="number" id="totalSchools">0</div><div class="label">Schools</div></div>
+            <div class="badge"><div class="number" id="avgEnglish">0%</div><div class="label">Avg English</div></div>
+            <div class="badge"><div class="number" id="avgOromo">0%</div><div class="label">Avg Afaan Oromoo</div></div>
         </div>
-        <div class="project-setup-card">
-            <div class="setup-title">
-                <i class="fas fa-sliders-h"></i> Project Configuration
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-btn active" data-section="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
+        <button class="nav-btn" data-section="woreda"><i class="fas fa-map-marker-alt"></i> Woreda Level</button>
+        <button class="nav-btn" data-section="school"><i class="fas fa-school"></i> School Level</button>
+        <button class="nav-btn" data-section="student"><i class="fas fa-user-graduate"></i> Student Registration</button>
+        <button class="nav-btn" data-section="assessment"><i class="fas fa-clipboard-list"></i> Assessment Tools</button>
+        <button class="nav-btn" data-section="reports"><i class="fas fa-file-alt"></i> Reports</button>
+        <button class="nav-btn" data-section="import"><i class="fas fa-upload"></i> Import Data</button>
+        <button class="nav-btn" data-section="settings"><i class="fas fa-cog"></i> Settings</button>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+    <div id="dashboard" class="section active">
+        <div class="grid-3">
+            <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> English Progress</div><div class="chart-container" style="height:250px;"><canvas id="englishChart"></canvas></div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> Afaan Oromoo Progress</div><div class="chart-container" style="height:250px;"><canvas id="oromoChart"></canvas></div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-chart-pie"></i> English Level Distribution</div><div class="chart-container" style="height:250px;"><canvas id="englishLevelChart"></canvas></div></div>
+        </div>
+        <div class="grid-2">
+            <div class="card"><div class="card-title"><i class="fas fa-chart-bar"></i> Performance by Grade</div><div class="chart-container" style="height:250px;"><canvas id="gradePerformanceChart"></canvas></div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-chart-simple"></i> Baseline vs Current Progress</div><div class="chart-container" style="height:250px;"><canvas id="baselineProgressChart"></canvas></div></div>
+        </div>
+        <div class="card"><div class="card-title"><i class="fas fa-tachometer-alt"></i> TaRL Program Summary</div><div id="programSummary"></div></div>
+    </div>
+
+    <!-- WOREDA LEVEL DATA SECTION -->
+    <div id="woreda" class="section">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-plus-circle"></i> Add Woreda Level Data</div>
+            <div class="grid-3">
+                <div class="form-group"><label>Zone (Godina)</label><input type="text" id="woredaZone" placeholder="e.g., East Wolega"></div>
+                <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="woredaName" placeholder="e.g., Leka Dulecha"></div>
+                <div class="form-group"><label>Number of Schools</label><input type="number" id="woredaSchools" placeholder="0"></div>
+                <div class="form-group"><label>Assessment Phase</label><select id="woredaPhase"><option value="baseline">Baseline (Ka'umsa)</option><option value="midline">Midline (Jidduu)</option><option value="endline">Endline (Xumura)</option></select></div>
+                <div class="form-group"><label>Grade</label><select id="woredaGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
+                <div class="form-group"><label>Total Students</label><input type="number" id="woredaTotalStudents" placeholder="0"></div>
             </div>
-            <div class="setup-controls">
-                <select id="projectTypeSelect" class="setup-select">
-                    <option value="education" selected>📚 Education (STEP‑GPE)</option>
-                    <option value="cp">🛡️ Child Protection</option>
-                    <option value="eie">🚨 EiE / Humanitarian</option>
-                    <option value="wash">💧 WASH</option>
-                    <option value="health">🏥 Health & Nutrition</option>
-                </select>
-                <input type="text" id="projectNameInput" class="setup-input" placeholder="Project name" value="Ethiopia Education CAN 2026">
-                <button id="applyConfigBtn" class="btn-primary"><i class="fas fa-check-circle"></i> Apply</button>
-            </div>
-            <div style="margin-top: 14px; display: flex; gap: 12px;">
-                <button id="saveTemplateBtn" class="btn-outline"><i class="far fa-bookmark"></i> Save as template</button>
-                <button id="exportConfigBtn" class="btn-outline"><i class="fas fa-download"></i> Export config</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- FRAMEWORK ALIGNMENT -->
-    <div class="framework-cloud">
-        <span class="fw-badge"><i class="fas fa-check-circle"></i> PM4DEV RBPM</span>
-        <span class="fw-badge"><i class="fas fa-check-circle"></i> UNICEF Module 5</span>
-        <span class="fw-badge"><i class="fas fa-check-circle"></i> GPE Indicators</span>
-        <span class="fw-badge"><i class="fas fa-check-circle"></i> INEE Minimum Standards</span>
-        <span class="fw-badge"><i class="fas fa-check-circle"></i> UNDP ToC</span>
-        <span class="fw-badge"><i class="fas fa-check-circle"></i> World Bank EdStats</span>
-        <span class="fw-badge"><i class="fas fa-check-circle"></i> EiE Competency</span>
-        <span class="fw-badge"><i class="fas fa-check-circle"></i> UIS Repository</span>
-    </div>
-
-    <!-- PROJECT CYCLE -->
-    <div class="cycle-wrapper">
-        <div class="cycle-steps">
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-clipboard-list"></i></div><div class="cycle-label">Needs Assessment</div></div>
-            <span class="cycle-arrow"><i class="fas fa-chevron-right"></i></span>
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-sitemap"></i></div><div class="cycle-label">Theory of Change</div></div>
-            <span class="cycle-arrow"><i class="fas fa-chevron-right"></i></span>
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-chart-bar"></i></div><div class="cycle-label">Results Framework</div></div>
-            <span class="cycle-arrow"><i class="fas fa-chevron-right"></i></span>
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-list-check"></i></div><div class="cycle-label">Activity Planning</div></div>
-            <span class="cycle-arrow"><i class="fas fa-chevron-right"></i></span>
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-calculator"></i></div><div class="cycle-label">Budget & Costing</div></div>
-            <span class="cycle-arrow"><i class="fas fa-chevron-right"></i></span>
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-gears"></i></div><div class="cycle-label">Implementation</div></div>
-            <span class="cycle-arrow"><i class="fas fa-chevron-right"></i></span>
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-desktop"></i></div><div class="cycle-label">Monitoring</div></div>
-            <span class="cycle-arrow"><i class="fas fa-chevron-right"></i></span>
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-file-alt"></i></div><div class="cycle-label">Reporting</div></div>
-            <span class="cycle-arrow"><i class="fas fa-chevron-right"></i></span>
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-lightbulb"></i></div><div class="cycle-label">Learning</div></div>
-            <span class="cycle-arrow"><i class="fas fa-chevron-right"></i></span>
-            <div class="cycle-item"><div class="cycle-icon"><i class="fas fa-door-open"></i></div><div class="cycle-label">Close‑out</div></div>
-        </div>
-    </div>
-
-    <!-- KPI DASHBOARD -->
-    <div class="kpi-dashboard">
-        <div class="kpi-panel">
-            <div class="kpi-header"><span class="kpi-title">Children Reached</span><span class="kpi-icon"><i class="fas fa-child"></i></span></div>
-            <div class="kpi-main-value">48,320</div>
-            <div class="kpi-trend"><i class="fas fa-arrow-up"></i> +12.4% vs target</div>
-            <div class="progress-container"><div class="progress-bar" style="width:89%"></div></div>
-        </div>
-        <div class="kpi-panel">
-            <div class="kpi-header"><span class="kpi-title">Teachers Trained</span><span class="kpi-icon"><i class="fas fa-chalkboard-user"></i></span></div>
-            <div class="kpi-main-value">1,284</div>
-            <div class="kpi-trend">Target: 1,600 · 82%</div>
-            <div class="progress-container"><div class="progress-bar" style="width:82%"></div></div>
-        </div>
-        <div class="kpi-panel">
-            <div class="kpi-header"><span class="kpi-title">Budget Execution</span><span class="kpi-icon"><i class="fas fa-sack-dollar"></i></span></div>
-            <div class="kpi-main-value">$3.24M</div>
-            <div class="kpi-trend">72% · Variance +3.2%</div>
-            <div class="progress-container"><div class="progress-bar" style="width:72%"></div></div>
-        </div>
-        <div class="kpi-panel">
-            <div class="kpi-header"><span class="kpi-title">Safeguarding Cases</span><span class="kpi-icon"><i class="fas fa-shield-heart"></i></span></div>
-            <div class="kpi-main-value">23</div>
-            <div class="kpi-trend"><i class="fas fa-check-circle"></i> 21 resolved</div>
-            <div class="progress-container"><div class="progress-bar" style="width:91%"></div></div>
-        </div>
-    </div>
-
-    <!-- MODULE NAVIGATION -->
-    <div class="module-nav">
-        <button class="nav-tab active" data-tab="panel1"><i class="fas fa-folder-tree"></i> Planning & ToC</button>
-        <button class="nav-tab" data-tab="panel2"><i class="fas fa-table-list"></i> Results & Indicators</button>
-        <button class="nav-tab" data-tab="panel3"><i class="fas fa-coins"></i> Budget & Costing</button>
-        <button class="nav-tab" data-tab="panel4"><i class="fas fa-chart-pie"></i> MEAL & Dashboards</button>
-        <button class="nav-tab" data-tab="panel5"><i class="fas fa-file-export"></i> Reporting & Close</button>
-    </div>
-
-    <!-- PANEL 1: PLANNING -->
-    <div class="module-panel active" id="panel1">
-        <div class="panel-grid-2">
-            <div>
-                <div class="section-title"><i class="fas fa-magnifying-glass"></i> Needs Assessment & Baseline</div>
-                <p><strong>Configurable data sources:</strong> EMIS, school mapping, CP risk assessments, rapid EiE, community consultations, safety assessments.</p>
-                <div class="info-block" style="margin-top: 24px;">
-                    <h4 style="margin-bottom: 16px;"><i class="fas fa-diagram-project"></i> Theory of Change (UNDP / PM4NGOs)</h4>
-                    <p><strong>IF</strong> children access safe, inclusive education, teachers trained, CP services exist, emergency continuity ensured</p>
-                    <p style="margin-top: 12px;"><strong>THEN</strong> learning outcomes improve, protection risks reduce, resilience strengthened.</p>
-                    <p style="margin-top: 16px; color: var(--success);"><i class="fas fa-check-circle"></i> Assumptions: school accessibility, community buy-in, government coordination.</p>
+            <div class="grid-2">
+                <!-- ENGLISH SECTION (replaces Maths) - 5 components -->
+                <div><h4><i class="fas fa-language"></i> English (5 Components)</h4>
+                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial Grade / Baseline)</label><input type="number" id="woredaEngInitial" placeholder="0"></div>
+                    <div class="form-group"><label>Arfii (Alphabet / Letter Recognition)</label><input type="number" id="woredaEngAlphabet" placeholder="0"></div>
+                    <div class="form-group"><label>Jechoota (Word Recognition / Vocabulary)</label><input type="number" id="woredaEngWords" placeholder="0"></div>
+                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence Reading)</label><input type="number" id="woredaEngSentence" placeholder="0"></div>
+                    <div class="form-group"><label>Seenessaa (Story / Reading Comprehension)</label><input type="number" id="woredaEngStory" placeholder="0"></div>
                 </div>
-                <p style="margin-top: 20px;" class="editable-field" title="Click to edit"><i class="far fa-pen-to-square"></i> Activity Breakdown (ABS): Output → Activities → Location → Responsible</p>
-            </div>
-            <div>
-                <div class="section-title"><i class="fas fa-sliders"></i> Template Configuration</div>
-                <div class="info-block">
-                    <p><strong>Active template:</strong> <span id="activeTemplateDisplay">Education (STEP‑GPE) with GPE/UIS indicators & INEE overlay</span></p>
-                    <p style="margin-top: 12px;"><i class="fas fa-database"></i> Indicator banks auto-load based on project type.</p>
-                    <button id="loadTemplatePanelBtn" class="btn-primary" style="margin-top: 20px; width: 100%;"><i class="fas fa-rotate"></i> Load template & refresh ToC</button>
-                </div>
-                <div class="chart-container">
-                    <canvas id="tocChartCanvas" style="max-height: 180px;"></canvas>
+                <!-- AFAAN OROMOO SECTION - 5 components -->
+                <div><h4><i class="fas fa-book"></i> Afaan Oromoo (5 Components)</h4>
+                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial Grade)</label><input type="number" id="woredaLitInitial" placeholder="0"></div>
+                    <div class="form-group"><label>Qubee (Alphabet Recognition)</label><input type="number" id="woredaLitQubee" placeholder="0"></div>
+                    <div class="form-group"><label>Jecha (Word Recognition)</label><input type="number" id="woredaLitWord" placeholder="0"></div>
+                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence)</label><input type="number" id="woredaLitSentence" placeholder="0"></div>
+                    <div class="form-group"><label>Seenessaa (Story / Comprehension)</label><input type="number" id="woredaLitStory" placeholder="0"></div>
                 </div>
             </div>
+            <button class="btn btn-primary" onclick="addWoredaData()"><i class="fas fa-save"></i> Save Woreda Data</button>
+        </div>
+        <div class="card">
+            <div class="card-title"><i class="fas fa-table"></i> Woreda Level Summary</div>
+            <div style="overflow-x: auto;"><table class="data-table" id="woredaTable"><thead><tr><th>Zone</th><th>Woreda</th><th>Schools</th><th>Phase</th><th>Grade</th><th>Total Students</th><th>English Score</th><th>Afaan Oromoo Score</th><th>Actions</th></tr></thead><tbody id="woredaTableBody"></tbody></table></div>
         </div>
     </div>
 
-    <!-- PANEL 2: INDICATORS -->
-    <div class="module-panel" id="panel2">
-        <div class="section-title"><i class="fas fa-ruler-combined"></i> Results Framework (GPE / UIS / INEE aligned)</div>
-        <table class="data-table">
-            <thead><tr><th>Level</th><th>Indicator (disaggregated)</th><th>Baseline</th><th>Target</th><th>Current</th><th>Status</th></tr></thead>
-            <tbody id="indicatorTableBody">
-                <tr><td>Impact</td><td>% children achieving minimum learning</td><td>42%</td><td>65%</td><td>58%</td><td><span class="status-badge"><span class="status-dot green"></span>On track</span></td></tr>
-                <tr><td>Outcome</td><td># children accessing safe education</td><td>18.2k</td><td>35k</td><td>31.5k</td><td><span class="status-badge"><span class="status-dot green"></span>On track</span></td></tr>
-                <tr><td>Output</td><td>Teachers trained (female/male)</td><td>340</td><td>1,600</td><td>1,284</td><td><span class="status-badge"><span class="status-dot amber"></span>Moderate</span></td></tr>
-                <tr><td>Output</td><td>CP cases referred & managed</td><td>112</td><td>500</td><td>389</td><td><span class="status-badge"><span class="status-dot green"></span>On track</span></td></tr>
-            </tbody>
-        </table>
-        <p style="margin-top: 20px;"><i class="fas fa-tags"></i> Disaggregation: sex, age, disability, IDP/refugee. Source: EMIS, Kobo, CPIMS+.</p>
-        <canvas id="indicatorBarCanvas" style="max-height: 180px; margin-top: 24px;"></canvas>
-    </div>
-
-    <!-- PANEL 3: BUDGET -->
-    <div class="module-panel" id="panel3">
-        <div class="panel-grid-2">
-            <div>
-                <div class="section-title"><i class="fas fa-layer-group"></i> Results‑Based Budget</div>
-                <p>Outcome → Output → Activity → Budget Line. Every birr traceable.</p>
-                <ul style="margin: 24px 0; list-style: none; line-height: 2.2;">
-                    <li><i class="fas fa-user" style="width: 24px;"></i> Personnel: $1,200,000</li>
-                    <li><i class="fas fa-chalkboard"></i> Training & Capacity: $680,000</li>
-                    <li><i class="fas fa-box"></i> Supplies & Materials: $420,000</li>
-                    <li><i class="fas fa-chart-simple"></i> MEAL: $310,000</li>
-                    <li><i class="fas fa-shield"></i> Safeguarding/AAP: $90,000</li>
-                </ul>
-                <div class="info-block">
-                    <strong>📊 Unit Costing (World Bank VfM):</strong>
-                    <p>Per school: $8,200 · Per child: $67 · Per teacher trained: $190 · Per session: $42</p>
+    <!-- SCHOOL LEVEL DATA SECTION -->
+    <div id="school" class="section">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-plus-circle"></i> Add School Level Data</div>
+            <div class="grid-3">
+                <div class="form-group"><label>Zone (Godina)</label><input type="text" id="schoolZone" placeholder="e.g., East Wolega"></div>
+                <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="schoolWoreda" placeholder="e.g., Leka Dulecha"></div>
+                <div class="form-group"><label>School ID</label><input type="text" id="schoolId" placeholder="School ID"></div>
+                <div class="form-group"><label>School Name</label><input type="text" id="schoolName" placeholder="School Name"></div>
+                <div class="form-group"><label>Grade (Kutaa)</label><select id="schoolGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
+                <div class="form-group"><label>Assessment Phase</label><select id="schoolPhase"><option value="baseline">Baseline</option><option value="midline">Midline</option><option value="endline">Endline</option></select></div>
+            </div>
+            <div class="grid-2">
+                <div><h4><i class="fas fa-language"></i> English Scores (5 Components)</h4>
+                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial)</label><input type="number" id="schoolEngInitial" placeholder="0"></div>
+                    <div class="form-group"><label>Arfii (Alphabet)</label><input type="number" id="schoolEngAlphabet" placeholder="0"></div>
+                    <div class="form-group"><label>Jechoota (Words)</label><input type="number" id="schoolEngWords" placeholder="0"></div>
+                    <div class="form-group"><label>Keeyyata Salphaa (Sentence)</label><input type="number" id="schoolEngSentence" placeholder="0"></div>
+                    <div class="form-group"><label>Seenessaa (Story)</label><input type="number" id="schoolEngStory" placeholder="0"></div>
+                </div>
+                <div><h4><i class="fas fa-book"></i> Afaan Oromoo Scores (5 Components)</h4>
+                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial)</label><input type="number" id="schoolLitInitial" placeholder="0"></div>
+                    <div class="form-group"><label>Qubee</label><input type="number" id="schoolLitQubee" placeholder="0"></div>
+                    <div class="form-group"><label>Jecha</label><input type="number" id="schoolLitWord" placeholder="0"></div>
+                    <div class="form-group"><label>Keeyyata Salphaa</label><input type="number" id="schoolLitSentence" placeholder="0"></div>
+                    <div class="form-group"><label>Seenessaa</label><input type="number" id="schoolLitStory" placeholder="0"></div>
                 </div>
             </div>
-            <div>
-                <div class="section-title"><i class="fas fa-chart-gantt"></i> Budget Control</div>
-                <p>Approved: $4.5M · Forecast: $4.38M · Commitments: $3.1M</p>
-                <div class="progress-container" style="margin: 16px 0;"><div class="progress-bar" style="width:72%"></div></div>
-                <p>Actual expenditures: $3.24M · Variance: +3.2% · Burn rate: 89%</p>
-                <canvas id="budgetDonutCanvas" style="margin-top: 30px;"></canvas>
-            </div>
+            <button class="btn btn-primary" onclick="addSchoolData()"><i class="fas fa-save"></i> Save School Data</button>
+        </div>
+        <div class="card">
+            <div class="card-title"><i class="fas fa-table"></i> School Level Data</div>
+            <div style="overflow-x: auto;"><table class="data-table" id="schoolTable"><thead><tr><th>Zone</th><th>Woreda</th><th>School Name</th><th>Grade</th><th>Phase</th><th>English Total</th><th>Afaan Oromoo Total</th><th>Actions</th></tr></thead><tbody id="schoolTableBody"></tbody></table></div>
         </div>
     </div>
 
-    <!-- PANEL 4: MEAL -->
-    <div class="module-panel" id="panel4">
-        <div class="panel-grid-2">
-            <div>
-                <div class="section-title"><i class="fas fa-tachometer-alt"></i> Core Dashboards</div>
-                <ul style="line-height: 2;">
-                    <li>📊 Results RAG & trend analysis</li>
-                    <li>💰 Budget vs actual, cost per output</li>
-                    <li>🧑‍🎓 Beneficiary: 52% girls, 7.3% CWD, 38% IDP</li>
-                    <li>🛡️ Safeguarding & AAP dashboard</li>
-                </ul>
-                <div class="section-title" style="margin-top: 30px;"><i class="fas fa-clipboard-check"></i> Monitoring & DQA</div>
-                <p>Accuracy, completeness, timeliness, reliability. Kobo/ODK, CPIMS.</p>
+    <!-- STUDENT REGISTRATION SECTION -->
+    <div id="student" class="section">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-user-plus"></i> Register Student (Barataa)</div>
+            <div class="grid-3">
+                <div class="form-group"><label>Zone (Godina)</label><input type="text" id="studentZone" placeholder="e.g., East Wolega"></div>
+                <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="studentWoreda" placeholder="e.g., Leka Dulecha"></div>
+                <div class="form-group"><label>School ID</label><input type="text" id="studentSchoolId" placeholder="School ID"></div>
+                <div class="form-group"><label>School Name</label><input type="text" id="studentSchoolName" placeholder="School Name"></div>
+                <div class="form-group"><label>Learner ID</label><input type="text" id="learnerId" placeholder="Auto-generated" readonly></div>
+                <div class="form-group"><label>Student Name</label><input type="text" id="studentName" placeholder="Full Name"></div>
+                <div class="form-group"><label>Sex</label><select id="studentSex"><option value="M">Dhiirra (Male)</option><option value="F">Dubartii (Female)</option></select></div>
+                <div class="form-group"><label>Grade (Kutaa)</label><select id="studentGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
+                <div class="form-group"><label>Special Needs (Fedhii Addaa)</label><select id="specialNeeds"><option value="None">None</option><option value="Vision">Rakkoo Arguu (Vision)</option><option value="Hearing">Rakkoo Dhaga'uu (Hearing)</option><option value="Physical">Hirdhiina Qaamaa (Physical)</option><option value="Communication">Rakkoo Waliifgaluu (Communication)</option><option value="Cognitive">Hanqiina Guddina Sammu (Cognitive)</option><option value="Behavioral">Rakkoo Amalaa (Behavioral)</option></select></div>
             </div>
-            <div>
-                <div class="section-title"><i class="fas fa-comment-dots"></i> Accountability (AAP)</div>
-                <p>Complaints mechanisms: 42 feedback cases, 38 resolved. Child‑friendly channels active.</p>
-                <div class="info-block" style="margin-top: 24px;">
-                    <i class="fas fa-chart-line"></i> <strong>INEE EiE competencies</strong> integrated into staff monitoring.
+            <div class="grid-2">
+                <!-- ENGLISH ASSESSMENT - 5 components -->
+                <div><h4><i class="fas fa-language"></i> English Assessment (5 Components)</h4>
+                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial Grade)</label><input type="number" id="studentEngInitial" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Arfii (Alphabet Recognition)</label><input type="number" id="studentEngAlphabet" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Jechoota (Word Recognition)</label><input type="number" id="studentEngWords" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence)</label><input type="number" id="studentEngSentence" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Seenessaa (Story Comprehension)</label><input type="number" id="studentEngStory" placeholder="0/1" step="1" min="0" max="1"></div>
+                </div>
+                <!-- AFAAN OROMOO ASSESSMENT - 5 components -->
+                <div><h4><i class="fas fa-book"></i> Afaan Oromoo Assessment (5 Components)</h4>
+                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial Grade)</label><input type="number" id="studentLitInitial" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Qubee (Alphabet Recognition)</label><input type="number" id="studentLitQubee" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Jecha (Word Recognition)</label><input type="number" id="studentLitWord" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence)</label><input type="number" id="studentLitSentence" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Seenessaa (Story Comprehension)</label><input type="number" id="studentLitStory" placeholder="0/1" step="1" min="0" max="1"></div>
                 </div>
             </div>
+            <button class="btn btn-primary" onclick="registerStudent()"><i class="fas fa-save"></i> Register Student</button>
+        </div>
+        <div class="card">
+            <div class="card-title"><i class="fas fa-table-list"></i> Student Roster (Kutaa 3-5)</div>
+            <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;"><table class="data-table" id="studentTable"><thead><tr><th>ID</th><th>Name</th><th>Zone</th><th>Woreda</th><th>School</th><th>Grade</th><th>Sex</th><th>English Score</th><th>Afaan Oromoo Score</th><th>English Level</th><th>Actions</th></tr></thead><tbody id="studentTableBody"></tbody></table></div>
         </div>
     </div>
 
-    <!-- PANEL 5: REPORTING -->
-    <div class="module-panel" id="panel5">
-        <div class="panel-grid-2">
-            <div>
-                <div class="section-title"><i class="fas fa-file-alt"></i> Multi‑purpose Reporting</div>
-                <p><strong>Donor (STEP‑GPE, UNICEF, ECW):</strong> results matrix, financial utilization.</p>
-                <p><strong>Cluster:</strong> 4Ws/5Ws, monthly submissions.</p>
-                <p><strong>Government:</strong> MoE‑aligned, EMIS‑compatible.</p>
-                <div class="section-title" style="margin-top: 30px;"><i class="fas fa-rotate-left"></i> Learning & Adaptation</div>
-                <p>Monthly reflection, mid‑term review, real‑time EiE adjustments.</p>
+    <!-- ASSESSMENT TOOLS SECTION -->
+    <div id="assessment" class="section">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-toolbox"></i> TaRL Assessment Tools Reference</div>
+            <div class="grid-3">
+                <div class="alert alert-info"><strong>📖 English Levels (6 Levels)</strong><br>1_Beginner → 2_Alphabet → 3_Words → 4_Sentence → 5_Story → 6_Computed</div>
+                <div class="alert alert-info"><strong>📖 Afaan Oromoo Levels (6 Levels)</strong><br>1_Beginner → 2_Qubee → 3_Jecha → 4_Keeyyata → 5_Seenessaa → 6_Computed</div>
+                <div class="alert alert-info"><strong>📋 Formulas</strong><br>English Total = Gulantaa Jalqabaa + Arfii + Jechoota + Keeyyata Salphaa + Seenessaa<br>Afaan Oromoo Total = Gulantaa Jalqabaa + Qubee + Jecha + Keeyyata Salphaa + Seenessaa</div>
             </div>
-            <div>
-                <div class="section-title"><i class="fas fa-door-closed"></i> Close‑out & Sustainability</div>
-                <p>Endline evaluation, financial closure, asset handover.</p>
-                <p style="margin-top: 12px;">Capacity building, system integration, community ownership.</p>
-                <div class="info-block" style="margin-top: 24px;">
-                    ✅ STEP‑GPE perfect fit · Results‑based · Equity‑focused · Strong MEAL
-                </div>
+        </div>
+        <div class="card">
+            <div class="card-title"><i class="fas fa-chart-line"></i> Assessment Progress Tracking</div>
+            <div class="grid-2">
+                <div class="chart-container" style="height:250px;"><canvas id="assessmentProgressChart"></canvas></div>
+                <div id="assessmentStats"></div>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <div class="system-footer">
-        <div><i class="fas fa-book-open"></i> <strong>Learning integration:</strong> PM4DEV RBPM · UNICEF Module 5 · GPE · INEE · UNDP ToC · World Bank</div>
-        <div class="footer-links">
-            <span><i class="fas fa-file-excel"></i> Excel RB‑PMS</span>
-            <span><i class="fas fa-chart-pie"></i> Power BI</span>
-            <span><i class="fas fa-mobile-alt"></i> Kobo tools</span>
-            <span><i class="fas fa-print"></i> SOPs</span>
+    <!-- REPORTS SECTION -->
+    <div id="reports" class="section">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-file-pdf"></i> Generate TaRL Report</div>
+            <div class="grid-2">
+                <div><div class="form-group"><label>Report Type</label><select id="reportType"><option value="woreda">Woreda Level Summary</option><option value="school">School Level Summary</option><option value="student">Student Roster</option></select></div></div>
+                <div><div class="form-group"><label>Format</label><select id="reportFormat"><option value="html">HTML Report</option><option value="pdf">PDF Report</option></select></div></div>
+            </div>
+            <button class="btn btn-primary" onclick="generateTaRLReport()"><i class="fas fa-download"></i> Generate Report</button>
         </div>
     </div>
+
+    <!-- IMPORT SECTION -->
+    <div id="import" class="section">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-file-excel"></i> Import Excel Data</div>
+            <div class="upload-area" onclick="document.getElementById('excelFile').click()" style="border:2px dashed #ccc; border-radius:20px; padding:40px; text-align:center; cursor:pointer;"><i class="fas fa-cloud-upload-alt" style="font-size:3rem; color:#2563eb;"></i><p>Click to upload Excel file (.xlsx, .xls, .csv)</p><input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importExcelData(this)"></div>
+            <div id="importPreview"></div>
+        </div>
+        <div class="card">
+            <div class="card-title"><i class="fas fa-database"></i> Load Sample TaRL Data</div>
+            <button class="btn btn-success" onclick="loadSampleData()"><i class="fas fa-chalkboard"></i> Load Sample Data (English & Afaan Oromoo)</button>
+        </div>
+    </div>
+
+    <!-- SETTINGS SECTION -->
+    <div id="settings" class="section">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-database"></i> Data Management</div>
+            <button class="btn btn-secondary" onclick="exportAllData()"><i class="fas fa-download"></i> Export All Data (JSON)</button>
+            <button class="btn btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Data</button>
+        </div>
+        <div class="card">
+            <div class="card-title"><i class="fas fa-info-circle"></i> About TaRL Department</div>
+            <p><strong>Teaching at the Right Level (TaRL) - English & Afaan Oromoo</strong><br>
+            Sadarkaa Aanaalee fi Manneen Barnootaa itti Sassaabamu<br>
+            Kutaa 3ffaa, 4ffaa fi 5ffaa<br><br>
+            <strong>English Components (5 parts):</strong><br>
+            1. Gulantaa Jalqabaa (Initial Grade / Baseline)<br>
+            2. Arfii (Alphabet / Letter Recognition)<br>
+            3. Jechoota (Word Recognition / Vocabulary)<br>
+            4. Keeyyata Salphaa (Simple Sentence Reading)<br>
+            5. Seenessaa (Story / Reading Comprehension)<br><br>
+            <strong>Afaan Oromoo Components (5 parts):</strong><br>
+            1. Gulantaa Jalqabaa (Initial Grade)<br>
+            2. Qubee (Alphabet Recognition)<br>
+            3. Jecha (Word Recognition)<br>
+            4. Keeyyata Salphaa (Simple Sentence)<br>
+            5. Seenessaa (Story / Comprehension)</p>
+        </div>
+    </div>
+    <div class="footer"><p>TaRL Department | English & Afaan Oromoo | 5 Components Each | Baseline · Midline · Endline</p></div>
 </div>
 
 <script>
-    (function() {
-        "use strict";
+    // Data Structures
+    let woredaData = [];
+    let schoolData = [];
+    let students = [];
 
-        // ----- TAB SYSTEM -----
-        const tabs = document.querySelectorAll('.nav-tab');
-        const panels = document.querySelectorAll('.module-panel');
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = tab.dataset.tab;
-                tabs.forEach(t => t.classList.remove('active'));
-                panels.forEach(p => p.classList.remove('active'));
-                tab.classList.add('active');
-                document.getElementById(targetId).classList.add('active');
-            });
-        });
+    function saveData() {
+        localStorage.setItem('tarl_woreda', JSON.stringify(woredaData));
+        localStorage.setItem('tarl_school', JSON.stringify(schoolData));
+        localStorage.setItem('tarl_students', JSON.stringify(students));
+    }
 
-        // ----- PROJECT CONFIGURATION (FULLY FUNCTIONAL) -----
-        const projectSelect = document.getElementById('projectTypeSelect');
-        const projectNameInput = document.getElementById('projectNameInput');
-        const applyBtn = document.getElementById('applyConfigBtn');
-        const saveTemplateBtn = document.getElementById('saveTemplateBtn');
-        const exportBtn = document.getElementById('exportConfigBtn');
-        const loadTemplateBtn = document.getElementById('loadTemplatePanelBtn');
-        const activeDisplay = document.getElementById('activeTemplateDisplay');
+    function loadData() {
+        woredaData = JSON.parse(localStorage.getItem('tarl_woreda') || '[]');
+        schoolData = JSON.parse(localStorage.getItem('tarl_school') || '[]');
+        students = JSON.parse(localStorage.getItem('tarl_students') || '[]');
+        updateAll();
+    }
 
-        const templateMap = {
-            'education': 'Education (STEP‑GPE) with GPE/UIS indicators & INEE overlay',
-            'cp': 'Child Protection · CPMS/INEE Minimum Standards',
-            'eie': 'EiE / Humanitarian · INEE MS · Cluster coordination',
-            'wash': 'WASH · Sphere standards · UNICEF WASH indicators',
-            'health': 'Health & Nutrition · WHO/UNICEF · IYCF indicators'
+    function updateAll() {
+        updateStats();
+        updateWoredaTable();
+        updateSchoolTable();
+        updateStudentTable();
+        updateCharts();
+        updateProgramSummary();
+    }
+
+    function updateStats() {
+        document.getElementById('totalStudents').textContent = students.length;
+        const uniqueSchools = [...new Set(schoolData.map(s => s.schoolName))];
+        document.getElementById('totalSchools').textContent = uniqueSchools.length;
+        let engTotal = 0, oromoTotal = 0;
+        students.forEach(s => { engTotal += s.englishScore || 0; oromoTotal += s.oromoScore || 0; });
+        document.getElementById('avgEnglish').textContent = students.length ? ((engTotal / (students.length * 5)) * 100).toFixed(0) : '0';
+        document.getElementById('avgOromo').textContent = students.length ? ((oromoTotal / (students.length * 5)) * 100).toFixed(0) : '0';
+    }
+
+    function addWoredaData() {
+        const engTotal = (parseInt(document.getElementById('woredaEngInitial').value)||0) + (parseInt(document.getElementById('woredaEngAlphabet').value)||0) + 
+                         (parseInt(document.getElementById('woredaEngWords').value)||0) + (parseInt(document.getElementById('woredaEngSentence').value)||0) + 
+                         (parseInt(document.getElementById('woredaEngStory').value)||0);
+        const litTotal = (parseInt(document.getElementById('woredaLitInitial').value)||0) + (parseInt(document.getElementById('woredaLitQubee').value)||0) + 
+                         (parseInt(document.getElementById('woredaLitWord').value)||0) + (parseInt(document.getElementById('woredaLitSentence').value)||0) + 
+                         (parseInt(document.getElementById('woredaLitStory').value)||0);
+        const data = {
+            id: 'WRD_' + Date.now(),
+            zone: document.getElementById('woredaZone').value,
+            woreda: document.getElementById('woredaName').value,
+            schools: parseInt(document.getElementById('woredaSchools').value) || 0,
+            phase: document.getElementById('woredaPhase').value,
+            grade: document.getElementById('woredaGrade').value,
+            totalStudents: parseInt(document.getElementById('woredaTotalStudents').value) || 0,
+            english: { initial: parseInt(document.getElementById('woredaEngInitial').value)||0, alphabet: parseInt(document.getElementById('woredaEngAlphabet').value)||0, words: parseInt(document.getElementById('woredaEngWords').value)||0, sentence: parseInt(document.getElementById('woredaEngSentence').value)||0, story: parseInt(document.getElementById('woredaEngStory').value)||0, total: engTotal },
+            oromo: { initial: parseInt(document.getElementById('woredaLitInitial').value)||0, qubee: parseInt(document.getElementById('woredaLitQubee').value)||0, word: parseInt(document.getElementById('woredaLitWord').value)||0, sentence: parseInt(document.getElementById('woredaLitSentence').value)||0, story: parseInt(document.getElementById('woredaLitStory').value)||0, total: litTotal }
         };
+        woredaData.push(data);
+        saveData(); updateAll(); alert('Woreda data saved!');
+    }
 
-        function updateActiveDisplay() {
-            const type = projectSelect.value;
-            const name = projectNameInput.value || 'Unnamed Project';
-            activeDisplay.innerText = `${name} · ${templateMap[type] || templateMap.education}`;
+    function addSchoolData() {
+        const engTotal = (parseInt(document.getElementById('schoolEngInitial').value)||0) + (parseInt(document.getElementById('schoolEngAlphabet').value)||0) + 
+                         (parseInt(document.getElementById('schoolEngWords').value)||0) + (parseInt(document.getElementById('schoolEngSentence').value)||0) + 
+                         (parseInt(document.getElementById('schoolEngStory').value)||0);
+        const litTotal = (parseInt(document.getElementById('schoolLitInitial').value)||0) + (parseInt(document.getElementById('schoolLitQubee').value)||0) + 
+                         (parseInt(document.getElementById('schoolLitWord').value)||0) + (parseInt(document.getElementById('schoolLitSentence').value)||0) + 
+                         (parseInt(document.getElementById('schoolLitStory').value)||0);
+        const data = {
+            id: 'SCH_' + Date.now(),
+            zone: document.getElementById('schoolZone').value,
+            woreda: document.getElementById('schoolWoreda').value,
+            schoolId: document.getElementById('schoolId').value,
+            schoolName: document.getElementById('schoolName').value,
+            grade: document.getElementById('schoolGrade').value,
+            phase: document.getElementById('schoolPhase').value,
+            english: { initial: parseInt(document.getElementById('schoolEngInitial').value)||0, alphabet: parseInt(document.getElementById('schoolEngAlphabet').value)||0, words: parseInt(document.getElementById('schoolEngWords').value)||0, sentence: parseInt(document.getElementById('schoolEngSentence').value)||0, story: parseInt(document.getElementById('schoolEngStory').value)||0, total: engTotal },
+            oromo: { initial: parseInt(document.getElementById('schoolLitInitial').value)||0, qubee: parseInt(document.getElementById('schoolLitQubee').value)||0, word: parseInt(document.getElementById('schoolLitWord').value)||0, sentence: parseInt(document.getElementById('schoolLitSentence').value)||0, story: parseInt(document.getElementById('schoolLitStory').value)||0, total: litTotal }
+        };
+        schoolData.push(data);
+        saveData(); updateAll(); alert('School data saved!');
+    }
+
+    function registerStudent() {
+        const learnerId = 'LRN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4).toUpperCase();
+        document.getElementById('learnerId').value = learnerId;
+        const englishScore = (parseInt(document.getElementById('studentEngInitial').value)||0) + (parseInt(document.getElementById('studentEngAlphabet').value)||0) + 
+                             (parseInt(document.getElementById('studentEngWords').value)||0) + (parseInt(document.getElementById('studentEngSentence').value)||0) + 
+                             (parseInt(document.getElementById('studentEngStory').value)||0);
+        const oromoScore = (parseInt(document.getElementById('studentLitInitial').value)||0) + (parseInt(document.getElementById('studentLitQubee').value)||0) + 
+                           (parseInt(document.getElementById('studentLitWord').value)||0) + (parseInt(document.getElementById('studentLitSentence').value)||0) + 
+                           (parseInt(document.getElementById('studentLitStory').value)||0);
+        const englishLevel = getEnglishLevel(englishScore);
+        const oromoLevel = getOromoLevel(oromoScore);
+        
+        students.push({
+            id: learnerId,
+            zone: document.getElementById('studentZone').value,
+            woreda: document.getElementById('studentWoreda').value,
+            schoolId: document.getElementById('studentSchoolId').value,
+            schoolName: document.getElementById('studentSchoolName').value,
+            name: document.getElementById('studentName').value,
+            sex: document.getElementById('studentSex').value,
+            grade: document.getElementById('studentGrade').value,
+            specialNeeds: document.getElementById('specialNeeds').value,
+            englishScore: englishScore,
+            oromoScore: oromoScore,
+            englishLevel: englishLevel,
+            oromoLevel: oromoLevel
+        });
+        saveData(); updateAll(); alert(`Student registered! ID: ${learnerId}`);
+    }
+
+    function getEnglishLevel(score) {
+        if(score === 0) return { level: 'Beginner', class: 'level-1', text: '1_Beginner' };
+        if(score === 1) return { level: 'Alphabet', class: 'level-2', text: '2_Alphabet' };
+        if(score === 2) return { level: 'Words', class: 'level-3', text: '3_Words' };
+        if(score === 3) return { level: 'Sentence', class: 'level-4', text: '4_Sentence' };
+        if(score === 4) return { level: 'Story', class: 'level-5', text: '5_Story' };
+        return { level: 'Computed', class: 'level-1', text: '6_Computed' };
+    }
+
+    function getOromoLevel(score) {
+        if(score === 0) return { level: 'Beginner', class: 'level-1', text: '1_Beginner' };
+        if(score === 1) return { level: 'Qubee', class: 'level-2', text: '2_Qubee' };
+        if(score === 2) return { level: 'Jecha', class: 'level-3', text: '3_Jecha' };
+        if(score === 3) return { level: 'Keeyyata', class: 'level-4', text: '4_Keeyyata' };
+        if(score === 4) return { level: 'Seenessaa', class: 'level-5', text: '5_Seenessaa' };
+        return { level: 'Computed', class: 'level-1', text: '6_Computed' };
+    }
+
+    function updateWoredaTable() {
+        const tbody = document.getElementById('woredaTableBody');
+        if(woredaData.length === 0) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">No woreda data. Add above.</td></tr>'; return; }
+        tbody.innerHTML = '';
+        woredaData.forEach(w => {
+            tbody.innerHTML += `<tr>
+                <td>${escapeHtml(w.zone)}</td>
+                <td>${escapeHtml(w.woreda)}</td>
+                <td>${w.schools}</td>
+                <td>${w.phase}</td>
+                <td>Kutaa ${w.grade}</td>
+                <td>${w.totalStudents}</td>
+                <td>${w.english.total} / 5 (${((w.english.total/5)*100).toFixed(0)}%)</td>
+                <td>${w.oromo.total} / 5 (${((w.oromo.total/5)*100).toFixed(0)}%)</td>
+                <td><button class="btn btn-danger btn-sm" onclick="deleteWoreda('${w.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+        });
+    }
+
+    function updateSchoolTable() {
+        const tbody = document.getElementById('schoolTableBody');
+        if(schoolData.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No school data. Add above.</td></tr>'; return; }
+        tbody.innerHTML = '';
+        schoolData.forEach(s => {
+            tbody.innerHTML += `<tr>
+                <td>${escapeHtml(s.zone)}</td>
+                <td>${escapeHtml(s.woreda)}</td>
+                <td>${escapeHtml(s.schoolName)}</td>
+                <td>Kutaa ${s.grade}</td>
+                <td>${s.phase}</td>
+                <td>${s.english.total} / 5 (${((s.english.total/5)*100).toFixed(0)}%)</td>
+                <td>${s.oromo.total} / 5 (${((s.oromo.total/5)*100).toFixed(0)}%)</td>
+                <td><button class="btn btn-danger btn-sm" onclick="deleteSchool('${s.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+        });
+    }
+
+    function updateStudentTable() {
+        const tbody = document.getElementById('studentTableBody');
+        if(students.length === 0) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">No students registered. Add above.</td></tr>'; return; }
+        tbody.innerHTML = '';
+        students.forEach(s => {
+            tbody.innerHTML += `<tr>
+                <td>${s.id.substring(0,12)}</td>
+                <td>${escapeHtml(s.name)}</td>
+                <td>${escapeHtml(s.zone)}</td>
+                <td>${escapeHtml(s.woreda)}</td>
+                <td>${escapeHtml(s.schoolName)}</td>
+                <td>Kutaa ${s.grade}</td>
+                <td>${s.sex === 'M' ? 'Dhiirra' : 'Dubartii'}</td>
+                <td>${s.englishScore}/5 (${((s.englishScore/5)*100).toFixed(0)}%)</td>
+                <td>${s.oromoScore}/5 (${((s.oromoScore/5)*100).toFixed(0)}%)</td>
+                <td><span class="literacy-level ${s.englishLevel.class}">${s.englishLevel.text}</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+        });
+    }
+
+    function updateCharts() {
+        const phases = ['baseline', 'midline', 'endline'];
+        const engData = phases.map(p => schoolData.filter(s => s.phase === p).reduce((sum, s) => sum + s.english.total, 0) / (schoolData.filter(s => s.phase === p).length || 1) * 20);
+        const oromoData = phases.map(p => schoolData.filter(s => s.phase === p).reduce((sum, s) => sum + s.oromo.total, 0) / (schoolData.filter(s => s.phase === p).length || 1) * 20);
+        if(window.engChart) window.engChart.destroy();
+        window.engChart = new Chart(document.getElementById('englishChart'), { type: 'line', data: { labels: ['Baseline', 'Midline', 'Endline'], datasets: [{ label: 'English (%)', data: engData, borderColor: '#3b82f6', fill: true }] } });
+        if(window.oromoChart) window.oromoChart.destroy();
+        window.oromoChart = new Chart(document.getElementById('oromoChart'), { type: 'line', data: { labels: ['Baseline', 'Midline', 'Endline'], datasets: [{ label: 'Afaan Oromoo (%)', data: oromoData, borderColor: '#10b981', fill: true }] } });
+        
+        const grade3 = students.filter(s => s.grade === '3').length;
+        const grade4 = students.filter(s => s.grade === '4').length;
+        const grade5 = students.filter(s => s.grade === '5').length;
+        if(window.gradeChart) window.gradeChart.destroy();
+        window.gradeChart = new Chart(document.getElementById('gradePerformanceChart'), { type: 'bar', data: { labels: ['Kutaa 3', 'Kutaa 4', 'Kutaa 5'], datasets: [{ label: 'Number of Students', data: [grade3, grade4, grade5], backgroundColor: '#7c3aed' }] } });
+    }
+
+    function updateProgramSummary() {
+        const total = students.length;
+        const males = students.filter(s => s.sex === 'M').length;
+        const females = students.filter(s => s.sex === 'F').length;
+        const cwd = students.filter(s => s.specialNeeds !== 'None').length;
+        const avgEng = total ? (students.reduce((s, st) => s + st.englishScore, 0) / total) * 20 : 0;
+        const avgOromo = total ? (students.reduce((s, st) => s + st.oromoScore, 0) / total) * 20 : 0;
+        document.getElementById('programSummary').innerHTML = `<div class="grid-3"><div class="alert alert-info"><strong>📊 Enrollment Summary</strong><br>Total: ${total}<br>Male: ${males}<br>Female: ${females}<br>CWD: ${cwd}</div><div class="alert alert-success"><strong>📈 Average Scores</strong><br>English: ${avgEng.toFixed(1)}%<br>Afaan Oromoo: ${avgOromo.toFixed(1)}%</div><div class="alert alert-info"><strong>🏫 Coverage</strong><br>Woredas: ${[...new Set(woredaData.map(w=>w.woreda))].length}<br>Schools: ${[...new Set(schoolData.map(s=>s.schoolName))].length}</div></div>`;
+    }
+
+    function deleteWoreda(id) { if(confirm('Delete woreda data?')) { woredaData = woredaData.filter(w => w.id !== id); saveData(); updateAll(); } }
+    function deleteSchool(id) { if(confirm('Delete school data?')) { schoolData = schoolData.filter(s => s.id !== id); saveData(); updateAll(); } }
+    function deleteStudent(id) { if(confirm('Delete student?')) { students = students.filter(s => s.id !== id); saveData(); updateAll(); } }
+
+    function generateTaRLReport() {
+        const type = document.getElementById('reportType').value;
+        const format = document.getElementById('reportFormat').value;
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaRL Program Report</title><style>body{font-family:Arial;margin:40px;}h1{color:#2563eb;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:8px;}</style></head><body><h1>📊 TaRL Program Report</h1><p>English & Afaan Oromoo | Generated: ${new Date().toLocaleString()}</p>`;
+        if(type === 'woreda') {
+            html += `<h2>Woreda Level Summary</h2><table><th>Zone</th><th>Woreda</th><th>Schools</th><th>English</th><th>Afaan Oromoo</th>`;
+            woredaData.forEach(w => { html += `<tr><td>${w.zone}</td><td>${w.woreda}</td><td>${w.schools}</td><td>${((w.english.total/5)*100).toFixed(0)}%</td><td>${((w.oromo.total/5)*100).toFixed(0)}%</td></tr>`; });
+            html += `</table>`;
+        } else if(type === 'school') {
+            html += `<h2>School Level Summary</h2><tr><th>School</th><th>Grade</th><th>English</th><th>Afaan Oromoo</th>`;
+            schoolData.forEach(s => { html += `<tr><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${((s.english.total/5)*100).toFixed(0)}%</td><td>${((s.oromo.total/5)*100).toFixed(0)}%</td></tr>`; });
+            html += `</table>`;
+        } else {
+            html += `<h2>Student Roster</h2><tr><th>Name</th><th>Grade</th><th>English Score</th><th>English Level</th><th>Afaan Oromoo Score</th><th>Afaan Oromoo Level</th>`;
+            students.forEach(s => { html += `<tr><td>${s.name}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.englishLevel.text}</td><td>${s.oromoScore}/5</td><td>${s.oromoLevel.text}</td></tr>`; });
+            html += `</table>`;
         }
+        html += `<h3>📐 Formulas Used</h3><p>English Total = Gulantaa Jalqabaa + Arfii + Jechoota + Keeyyata Salphaa + Seenessaa</p><p>Afaan Oromoo Total = Gulantaa Jalqabaa + Qubee + Jecha + Keeyyata Salphaa + Seenessaa</p></body></html>`;
+        if(format === 'html') { const w=window.open(); w.document.write(html); w.document.close(); }
+        else { const div=document.createElement('div'); div.innerHTML=html; document.body.appendChild(div); html2pdf().from(div).set({margin:1}).save(); setTimeout(()=>document.body.removeChild(div),1000); }
+    }
 
-        applyBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            updateActiveDisplay();
-            // Update indicator table based on selection (simulated)
-            const indicatorBody = document.getElementById('indicatorTableBody');
-            const type = projectSelect.value;
-            let newRows = '';
-            if (type === 'education') {
-                newRows = `<tr><td>Impact</td><td>% children achieving minimum learning</td><td>42%</td><td>65%</td><td>58%</td><td><span class="status-badge"><span class="status-dot green"></span>On track</span></td></tr>
-                           <tr><td>Outcome</td><td># children accessing safe education</td><td>18.2k</td><td>35k</td><td>31.5k</td><td><span class="status-badge"><span class="status-dot green"></span>On track</span></td></tr>`;
-            } else if (type === 'cp') {
-                newRows = `<tr><td>Impact</td><td>% children reporting feeling safe</td><td>68%</td><td>85%</td><td>74%</td><td><span class="status-badge"><span class="status-dot amber"></span>Moderate</span></td></tr>
-                           <tr><td>Outcome</td><td># children accessing CP services</td><td>2,450</td><td>6,000</td><td>4,120</td><td><span class="status-badge"><span class="status-dot green"></span>On track</span></td></tr>`;
-            } else {
-                newRows = `<tr><td>Impact</td><td>% children with improved well-being</td><td>55%</td><td>75%</td><td>63%</td><td><span class="status-badge"><span class="status-dot green"></span>On track</span></td></tr>
-                           <tr><td>Outcome</td><td># beneficiaries reached</td><td>12k</td><td>30k</td><td>22k</td><td><span class="status-badge"><span class="status-dot green"></span>On track</span></td></tr>`;
-            }
-            indicatorBody.innerHTML = newRows + indicatorBody.innerHTML.split('</tr>').slice(2).join('</tr>');
-            alert(`✅ Project "${projectNameInput.value}" configured with ${projectSelect.options[projectSelect.selectedIndex].text} template.\nIndicators updated.`);
-        });
+    function importExcelData(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
+            document.getElementById('importPreview').innerHTML = `<div class="alert alert-success">✅ Imported ${json.length} rows.</div>`;
+            saveData(); updateAll();
+        };
+        reader.readAsArrayBuffer(file);
+    }
 
-        saveTemplateBtn.addEventListener('click', () => {
-            const config = { type: projectSelect.value, name: projectNameInput.value };
-            localStorage.setItem('rbpms_template', JSON.stringify(config));
-            alert('💾 Configuration saved as template.');
-        });
+    function loadSampleData() {
+        woredaData = [{ id:'WRD1', zone:'East Wolega', woreda:'Leka Dulecha', schools:12, phase:'baseline', grade:'3', totalStudents:420, english:{total:4}, oromo:{total:4} }];
+        schoolData = [{ id:'SCH1', zone:'East Wolega', woreda:'Leka Dulecha', schoolId:'001', schoolName:"Ka'umsa Primary School", grade:'3', phase:'baseline', english:{total:4}, oromo:{total:4} }];
+        students = [
+            { id:'STU1', zone:'East Wolega', woreda:'Leka Dulecha', schoolId:'001', schoolName:"Ka'umsa Primary School", name:'Almaz Tesfaye', sex:'F', grade:'3', specialNeeds:'None', englishScore:4, oromoScore:5, englishLevel:{text:'4_Sentence',class:'level-4'}, oromoLevel:{text:'5_Seenessaa',class:'level-5'} },
+            { id:'STU2', zone:'West Wolega', woreda:'Gimbi', schoolId:'002', schoolName:'Chuta Goch Primary School', name:'Biruk Abebe', sex:'M', grade:'4', specialNeeds:'None', englishScore:3, oromoScore:4, englishLevel:{text:'3_Words',class:'level-3'}, oromoLevel:{text:'4_Keeyyata',class:'level-4'} }
+        ];
+        saveData(); updateAll(); alert('Sample data loaded!');
+    }
 
-        exportBtn.addEventListener('click', () => {
-            const config = { type: projectSelect.value, name: projectNameInput.value, timestamp: new Date().toISOString() };
-            const blob = new Blob([JSON.stringify(config, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `rbpms_config_${Date.now()}.json`; a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        loadTemplateBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            updateActiveDisplay();
-            alert('📌 Indicator banks & ToC assumptions loaded based on selected project type.');
-        });
-
-        updateActiveDisplay();
-
-        // ----- CHARTS -----
-        // ToC trajectory
-        new Chart(document.getElementById('tocChartCanvas'), {
-            type: 'line',
-            data: { labels: ['Baseline', 'Year 1', 'Year 2'], datasets: [{ label: 'Learning outcome %', data: [42, 58, 72], borderColor: '#0a4a6b', borderWidth: 3, tension: 0.2 }] },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-
-        // Indicator bar
-        new Chart(document.getElementById('indicatorBarCanvas'), {
-            type: 'bar',
-            data: { labels: ['Impact', 'Outcome', 'Teachers', 'CP'], datasets: [{ data: [89, 90, 82, 78], backgroundColor: '#1a6a94', borderRadius: 8 }] },
-            options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } } }
-        });
-
-        // Budget donut
-        new Chart(document.getElementById('budgetDonutCanvas'), {
-            type: 'doughnut',
-            data: { labels: ['Personnel', 'Training', 'Supplies', 'MEAL', 'Safeguarding'], datasets: [{ data: [1.2, 0.68, 0.42, 0.31, 0.09], backgroundColor: ['#0a4a6b', '#1a6a94', '#2a9d8f', '#4a9db5', '#7fb8d0'] }] },
-            options: { plugins: { legend: { position: 'bottom' } } }
-        });
-
-        // Editable field simulation
-        document.querySelectorAll('.editable-field').forEach(el => {
-            el.addEventListener('click', () => alert('✏️ Edit mode: Activity breakdown can be customized.'));
-        });
-    })();
+    function exportAllData() { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify({woredaData,schoolData,students},null,2)],{type:'application/json'})); a.download=`tarl_data.json`; a.click(); }
+    function clearAllData() { if(confirm('Delete ALL TaRL data?')) { localStorage.clear(); woredaData=[]; schoolData=[]; students=[]; updateAll(); alert('All data cleared.'); } }
+    function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    document.querySelectorAll('.nav-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(btn.dataset.section).classList.add('active'); }); });
+    loadData();
 </script>
 </body>
 </html>
