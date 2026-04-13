@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaRL Department | Working Admin Login | mohammedscho2023@gmail.com</title>
+    <title>TaRL Department | Admin OTP Login | mohammedscho2023@gmail.com</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -50,6 +50,7 @@
         .alert { padding: 10px 14px; border-radius: 10px; margin-bottom: 15px; font-size: 0.75rem; }
         .alert-info { background: #dbeafe; color: #1e40af; border-left: 4px solid #2563eb; }
         .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .alert-warning { background: #fed7aa; color: #92400e; border-left: 4px solid #f59e0b; }
         .level-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
         .level-1 { background: #fee2e2; color: #991b1b; }
         .level-2 { background: #fed7aa; color: #9a3412; }
@@ -63,6 +64,7 @@
         .role-btn.active { border-color: #2563eb; background: #dbeafe; color: #2563eb; }
         .user-info { display: flex; align-items: center; gap: 15px; background: #f1f5f9; padding: 8px 18px; border-radius: 40px; }
         .user-avatar { width: 35px; height: 35px; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+        .otp-box { background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 12px; font-family: monospace; font-size: 0.8rem; margin-top: 15px; text-align: center; letter-spacing: 2px; }
         .email-sim { background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 12px; font-family: monospace; font-size: 0.7rem; margin-top: 15px; text-align: left; }
         .admin-credentials { background: #d1fae5; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 0.75rem; text-align: center; border: 1px solid #10b981; }
         @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
@@ -82,14 +84,14 @@
                 </div>
                 
                 <div class="admin-credentials">
-                    <strong>🔐 ADMIN LOGIN CREDENTIALS (WORKING):</strong><br>
-                    📧 Email: <code style="background:#fff;padding:2px 6px;border-radius:4px;">admin@tarl.com</code> &nbsp;&nbsp;|&nbsp;&nbsp;
-                    🔑 Password: <code style="background:#fff;padding:2px 6px;border-radius:4px;">admin123</code>
+                    <strong>🔐 ADMIN LOGIN:</strong><br>
+                    📧 Email: <code>mohammedscho2023@gmail.com</code><br>
+                    🔑 One-Time Password (OTP) will be sent to this email
                 </div>
 
                 <div class="role-selector">
                     <div class="role-btn active" data-role="user" onclick="selectLoginRole('user')"><i class="fas fa-user"></i> Data Collector Login</div>
-                    <div class="role-btn" data-role="admin" onclick="selectLoginRole('admin')"><i class="fas fa-user-shield"></i> Admin Login</div>
+                    <div class="role-btn" data-role="admin" onclick="selectLoginRole('admin')"><i class="fas fa-user-shield"></i> Admin OTP Login</div>
                 </div>
 
                 <div id="userLoginForm">
@@ -101,9 +103,11 @@
                 </div>
 
                 <div id="adminLoginForm" style="display:none;">
-                    <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@tarl.com"></div>
-                    <div class="form-group"><label>Admin Password</label><input type="password" id="adminPassword" placeholder="admin123"></div>
-                    <button class="btn btn-primary" onclick="loginAdmin()" style="width:100%;"><i class="fas fa-user-shield"></i> Login as Admin</button>
+                    <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" value="mohammedscho2023@gmail.com" readonly style="background:#f1f5f9;"></div>
+                    <div class="form-group"><label>Enter OTP Code</label><input type="text" id="adminOTP" placeholder="Enter 6-digit OTP" maxlength="6"></div>
+                    <button class="btn btn-primary" onclick="verifyAdminOTP()" style="width:100%;"><i class="fas fa-key"></i> Verify OTP & Login</button>
+                    <button class="btn btn-secondary" onclick="requestAdminOTP()" style="width:100%; margin-top:10px;"><i class="fas fa-envelope"></i> Send OTP to Email</button>
+                    <div id="otpStatus" style="margin-top:15px;"></div>
                 </div>
 
                 <div id="registerForm" style="display:none; margin-top:20px;">
@@ -125,7 +129,7 @@
     <!-- ADMIN MAIN APP -->
     <div id="adminApp" style="display:none;">
         <div class="header">
-            <div class="logo"><h1><i class="fas fa-user-shield"></i> TaRL Admin Panel</h1><p>Administrator Dashboard | Email: mohammedscho2023@gmail.com</p></div>
+            <div class="logo"><h1><i class="fas fa-user-shield"></i> TaRL Admin Panel</h1><p>Administrator Dashboard | OTP Authenticated</p></div>
             <div class="stats-badge">
                 <div class="badge"><div class="number" id="adminTotalUsers">0</div><div class="label">Total Users</div></div>
                 <div class="badge"><div class="number" id="adminPendingUsers">0</div><div class="label">Pending</div></div>
@@ -136,7 +140,6 @@
         <div class="nav-tabs">
             <button class="nav-btn active" data-section="adminDashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
             <button class="nav-btn" data-section="userManagement"><i class="fas fa-users"></i> User Management</button>
-            <button class="nav-btn" data-section="emailSimulator"><i class="fas fa-envelope"></i> Email Simulator</button>
             <button class="nav-btn" data-section="adminReports"><i class="fas fa-file-alt"></i> Reports</button>
             <button class="nav-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
@@ -153,14 +156,6 @@
             <div class="card">
                 <div class="card-title"><i class="fas fa-users"></i> User Management - Approve/Reject Data Collectors</div>
                 <div style="overflow-x:auto;"><table class="data-table" id="adminUsersTable"><thead><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminUsersTableBody"></tbody>}</div>
-            </div>
-        </div>
-
-        <div id="emailSimulator" class="section">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-envelope"></i> Email to Admin (mohammedscho2023@gmail.com)</div>
-                <div class="alert alert-info"><i class="fas fa-info-circle"></i> When a user registers, an approval request appears here. Click Approve or Reject.</div>
-                <div id="emailSimulatorContent" class="email-sim">No pending approvals. Register a user to see approval requests.</div>
             </div>
         </div>
 
@@ -249,7 +244,7 @@
 
         <div id="userWoreda" class="section">
             <div class="card"><div class="card-title"><i class="fas fa-map-marker-alt"></i> My Woreda Summary</div>
-                <div style="overflow-x:auto;"><table class="data-table" id="userWoredaTable"><thead><tr><th>Zone</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr></thead><tbody id="userWoredaTableBody"></tbody>}</div>
+                <div style="overflow-x:auto;"><table class="data-table" id="userWoredaTable"><thead><tr><th>Zone</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></td></thead><tbody id="userWoredaTableBody"></tbody>}</div>
             </div>
         </div>
 
@@ -266,7 +261,7 @@
                 <button class="btn btn-primary" onclick="generateUserReport()"><i class="fas fa-download"></i> Generate Report</button>
             </div>
         </div>
-        <div class="footer"><p>TaRL Department | Data Collectors only see their approved Zone & Woreda</p></div>
+        <div class="footer"><p>TaRL Department | Admin OTP Login | mohammedscho2023@gmail.com</p></div>
     </div>
 </div>
 
@@ -277,11 +272,73 @@
     let currentUser = null;
     let activityLog = [];
     let pendingApprovals = [];
+    let adminOTP = null;
+    let otpExpiry = null;
 
-    const ADMIN_EMAIL = "admin@tarl.com";
-    const ADMIN_PASSWORD = "admin123";
+    const ADMIN_EMAIL = "mohammedscho2023@gmail.com";
 
-    // FIXED: Initialize admin account on page load
+    function generateOTP() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    function sendOTPEmail(otp) {
+        // Display OTP in a visible box on screen (simulating email)
+        const otpBox = document.getElementById('otpStatus');
+        if(otpBox) {
+            otpBox.innerHTML = `<div class="otp-box">
+                <i class="fas fa-envelope"></i> <strong>📧 EMAIL SIMULATION - OTP SENT TO: ${ADMIN_EMAIL}</strong><br><br>
+                <span style="font-size:24px; letter-spacing:5px;">🔐 YOUR OTP CODE: <strong style="color:#10b981;">${otp}</strong></span><br><br>
+                <small>This OTP is valid for 5 minutes. Enter it in the field above to login.</small>
+            </div>`;
+        }
+        
+        // Also log to console
+        console.log(`\n========== OTP EMAIL TO ${ADMIN_EMAIL} ==========`);
+        console.log(`Your OTP code is: ${otp}`);
+        console.log(`Valid for 5 minutes.`);
+        console.log(`================================================\n`);
+        
+        logActivity(`OTP sent to admin email: ${ADMIN_EMAIL}`);
+        return true;
+    }
+
+    function requestAdminOTP() {
+        const otp = generateOTP();
+        adminOTP = otp;
+        otpExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
+        sendOTPEmail(otp);
+        showToast(`OTP sent to ${ADMIN_EMAIL}. Check the OTP box above.`, 'success');
+    }
+
+    function verifyAdminOTP() {
+        const enteredOTP = document.getElementById('adminOTP').value;
+        if(!adminOTP) {
+            alert('Please request OTP first. Click "Send OTP to Email".');
+            return;
+        }
+        if(Date.now() > otpExpiry) {
+            alert('OTP has expired. Please request a new one.');
+            adminOTP = null;
+            return;
+        }
+        if(enteredOTP === adminOTP) {
+            // Login successful
+            const adminUser = users.find(u => u.email === ADMIN_EMAIL && u.role === 'admin');
+            if(adminUser) {
+                currentUser = adminUser;
+                logActivity(`Admin logged in via OTP`);
+                showAdminApp();
+                document.getElementById('adminOTP').value = '';
+                adminOTP = null;
+                showToast('Admin login successful!', 'success');
+            } else {
+                alert('Admin account not found. Please contact support.');
+            }
+        } else {
+            alert('Invalid OTP. Please try again.');
+        }
+    }
+
     function initializeSystem() {
         // Load existing data
         const savedUsers = localStorage.getItem('tarl_users');
@@ -296,14 +353,12 @@
         pendingApprovals = JSON.parse(localStorage.getItem('tarl_pending') || '[]');
         
         // Check if admin exists - if NOT, create it
-        const adminExists = users.find(u => u.role === 'admin');
+        const adminExists = users.find(u => u.email === ADMIN_EMAIL && u.role === 'admin');
         if(!adminExists) {
-            console.log("Creating admin account...");
             users.push({
                 id: 'ADMIN_1',
                 name: 'System Administrator',
                 email: ADMIN_EMAIL,
-                password: btoa(ADMIN_PASSWORD),
                 role: 'admin',
                 zone: '',
                 woreda: '',
@@ -311,7 +366,7 @@
                 registeredAt: new Date().toISOString()
             });
             saveData();
-            console.log("Admin account created successfully!");
+            logActivity(`Admin account created for ${ADMIN_EMAIL}`);
         }
         
         updateAll();
@@ -351,58 +406,7 @@
                 timestamp: new Date().toISOString()
             });
             saveData();
-            updateEmailSimulator();
             logActivity(`Pending approval added for: ${user.name}`);
-        }
-    }
-
-    function updateEmailSimulator() {
-        const container = document.getElementById('emailSimulatorContent');
-        if(!container) return;
-        if(pendingApprovals.length === 0) {
-            container.innerHTML = '✅ No pending approvals. All users have been processed.';
-            return;
-        }
-        let html = '';
-        pendingApprovals.forEach(p => {
-            html += `
-            <div style="background:#0f172a; margin-bottom:15px; padding:12px; border-radius:8px; border-left:4px solid #f59e0b;">
-                <div><i class="fas fa-envelope"></i> <strong>To: mohammedscho2023@gmail.com</strong></div>
-                <div><i class="fas fa-user"></i> <strong>User:</strong> ${escapeHtml(p.name)} (${escapeHtml(p.email)})</div>
-                <div><i class="fas fa-map-marker-alt"></i> <strong>Zone:</strong> ${escapeHtml(p.zone)} | <strong>Woreda:</strong> ${escapeHtml(p.woreda)}</div>
-                <div><i class="fas fa-clock"></i> <strong>Requested:</strong> ${new Date(p.timestamp).toLocaleString()}</div>
-                <div style="margin-top:12px;">
-                    <button class="btn btn-success btn-sm" onclick="approveUserFromEmail('${p.userId}')"><i class="fas fa-check"></i> ✅ Approve User</button>
-                    <button class="btn btn-danger btn-sm" onclick="rejectUserFromEmail('${p.userId}')"><i class="fas fa-times"></i> ❌ Reject User</button>
-                </div>
-            </div>`;
-        });
-        container.innerHTML = html;
-    }
-
-    function approveUserFromEmail(userId) {
-        const user = users.find(u => u.id === userId);
-        if(user) {
-            user.status = 'approved';
-            pendingApprovals = pendingApprovals.filter(p => p.userId !== userId);
-            saveData();
-            logActivity(`User ${user.name} was APPROVED via email link`);
-            updateAdminApp();
-            updateEmailSimulator();
-            showToast(`${user.name} approved successfully!`);
-        }
-    }
-
-    function rejectUserFromEmail(userId) {
-        const user = users.find(u => u.id === userId);
-        if(user) {
-            users = users.filter(u => u.id !== userId);
-            pendingApprovals = pendingApprovals.filter(p => p.userId !== userId);
-            saveData();
-            logActivity(`User ${user.name} was REJECTED via email link`);
-            updateAdminApp();
-            updateEmailSimulator();
-            showToast(`${user.name} rejected.`, 'error');
         }
     }
 
@@ -417,6 +421,7 @@
         } else {
             document.getElementById('userLoginForm').style.display = 'none';
             document.getElementById('adminLoginForm').style.display = 'block';
+            document.getElementById('otpStatus').innerHTML = '';
         }
     }
 
@@ -475,19 +480,6 @@
         }
     }
 
-    function loginAdmin() {
-        const email = document.getElementById('adminEmail').value;
-        const password = document.getElementById('adminPassword').value;
-        const admin = users.find(u => u.email === email && atob(u.password) === password && u.role === 'admin');
-        if(admin) {
-            currentUser = admin;
-            logActivity(`Admin ${admin.name} logged in`);
-            showAdminApp();
-        } else {
-            alert('❌ Invalid admin credentials.\n\nUse:\nEmail: admin@tarl.com\nPassword: admin123');
-        }
-    }
-
     function showUserApp() {
         document.getElementById('authSection').style.display = 'none';
         document.getElementById('adminApp').style.display = 'none';
@@ -505,7 +497,6 @@
         document.getElementById('adminApp').style.display = 'block';
         document.getElementById('adminName').innerText = currentUser.name;
         updateAdminApp();
-        updateEmailSimulator();
     }
 
     function logout() {
@@ -516,8 +507,9 @@
         document.getElementById('userApp').style.display = 'none';
         document.getElementById('userEmail').value = '';
         document.getElementById('userPassword').value = '';
-        document.getElementById('adminEmail').value = '';
-        document.getElementById('adminPassword').value = '';
+        document.getElementById('adminOTP').value = '';
+        document.getElementById('otpStatus').innerHTML = '';
+        adminOTP = null;
         selectLoginRole('user');
     }
 
@@ -556,7 +548,7 @@
                 <td>${escapeHtml(u.name)}</td><td>${escapeHtml(u.email)}</td><td>${escapeHtml(u.zone)}</td><td>${escapeHtml(u.woreda)}</td>
                 <td>${u.status === 'approved' ? '<span class="level-badge level-4">✅ Approved</span>' : '<span class="level-badge level-2">⏳ Pending</span>'}</td>
                 <td>${new Date(u.registeredAt).toLocaleDateString()}</td>
-                <td>${u.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveUserFromEmail('${u.id}')"><i class="fas fa-check"></i> Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectUserFromEmail('${u.id}')"><i class="fas fa-times"></i> Reject</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i> Delete</button>`}</td>
+                <td>${u.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveUser('${u.id}')"><i class="fas fa-check"></i> Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectUser('${u.id}')"><i class="fas fa-times"></i> Reject</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i> Delete</button>`}</td>
             </tr>`;
         });
     }
@@ -568,6 +560,30 @@
         }
     }
 
+    function approveUser(userId) {
+        const user = users.find(u => u.id === userId);
+        if(user) {
+            user.status = 'approved';
+            pendingApprovals = pendingApprovals.filter(p => p.userId !== userId);
+            saveData();
+            logActivity(`User ${user.name} was APPROVED`);
+            updateAdminApp();
+            showToast(`${user.name} approved successfully!`);
+        }
+    }
+
+    function rejectUser(userId) {
+        const user = users.find(u => u.id === userId);
+        if(user) {
+            users = users.filter(u => u.id !== userId);
+            pendingApprovals = pendingApprovals.filter(p => p.userId !== userId);
+            saveData();
+            logActivity(`User ${user.name} was REJECTED`);
+            updateAdminApp();
+            showToast(`${user.name} rejected.`, 'error');
+        }
+    }
+
     function deleteUser(userId) {
         if(confirm('Delete this user?')) {
             const user = users.find(u => u.id === userId);
@@ -576,7 +592,6 @@
             saveData();
             logActivity(`User ${user?.name} was DELETED`);
             updateAdminApp();
-            updateEmailSimulator();
             showToast(`${user?.name} deleted.`);
         }
     }
@@ -586,9 +601,9 @@
         let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaRL Admin Report</title><style>body{font-family:Arial;margin:40px;}</style></head><body>
         <h1>TaRL Department - Admin Report</h1><p>Generated: ${new Date().toLocaleString()}</p>
         <h2>Users</h2><table border="1"><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Status</th></tr>`;
-        users.filter(u=>u.role==='data_collector').forEach(u => html += `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.zone}</td><td>${u.woreda}</td><td>${u.status}</td></tr>`);
+        users.filter(u=>u.role==='data_collector').forEach(u => html += `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.zone}</td><td>${u.woreda}</td><td>${u.status}</td>`);
         html += `</table><h2>Students</h2><table border="1"><tr><th>Name</th><th>School</th><th>Zone</th><th>Woreda</th><th>English</th><th>Oromo</th></tr>`;
-        students.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>${s.zone}</td><td>${s.woreda}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td></tr>`);
+        students.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>${s.zone}</td><td>${s.woreda}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td>`);
         html += `</table></body></html>`;
         if(format === 'html') { const w=window.open(); w.document.write(html); w.document.close(); }
         else { const div=document.createElement('div'); div.innerHTML=html; document.body.appendChild(div); html2pdf().from(div).set({margin:1}).save(); setTimeout(()=>document.body.removeChild(div),1000); }
@@ -640,7 +655,8 @@
             tbody.innerHTML += `<tr><td>${s.id.substring(0,10)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.schoolName)}</td><td>Kutaa ${s.grade}</td>
             <td>${s.englishScore}/5 <span class="level-badge ${s.englishLevel.class}">${s.englishLevel.name}</span></td>
             <td>${s.oromoScore}/5 <span class="level-badge ${s.oromoLevel.class}">${s.oromoLevel.name}</span></td>
-            <td><button class="btn btn-danger btn-sm" onclick="deleteUserStudent('${s.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+            <td><button class="btn btn-danger btn-sm" onclick="deleteUserStudent('${s.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
         });
         
         const wMap = new Map();
@@ -654,7 +670,7 @@
         userStudents.forEach(s => { const key = `${s.schoolName}|${s.grade}`; if(!sMap.has(key)) sMap.set(key, { school:s.schoolName, woreda:s.woreda, grade:s.grade, count:0, eng:0, oro:0 }); const d = sMap.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
         const sTbody = document.getElementById('userSchoolTableBody');
         sTbody.innerHTML = '';
-        for(let d of sMap.values()) { sTbody.innerHTML += `<tr><td>${d.school}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
+        for(let d of sMap.values()) { sTbody.innerHTML += `<td><td>${d.school}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
         <td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`; }
         
         const grades = ['3','4','5'];
@@ -704,7 +720,7 @@
             userStudents.forEach(s => { const key = `${s.grade}`; if(!map.has(key)) map.set(key, { grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
             html += `<h2>Woreda Summary</h2><table border="1"><tr><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr>`;
             for(let d of map.values()) html += `<tr><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
-            html += `</table>`;
+            html += ` licensierad`;
         } else if(type === 'school') {
             const map = new Map();
             userStudents.forEach(s => { const key = `${s.schoolName}|${s.grade}`; if(!map.has(key)) map.set(key, { school:s.schoolName, grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
@@ -735,7 +751,6 @@
 
     function updateAll() { }
     
-    // Initialize the system
     initializeSystem();
     selectLoginRole('user');
 </script>
