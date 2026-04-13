@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaRL Department | Role-Based Access | Admin & Data Collector Login</title>
+    <title>TaRL Department | Admin Email Approval | Role-Based Access Control</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -65,8 +65,10 @@
         .role-btn.active { border-color: #2563eb; background: #dbeafe; color: #2563eb; }
         .user-info { display: flex; align-items: center; gap: 15px; background: #f1f5f9; padding: 8px 18px; border-radius: 40px; }
         .user-avatar { width: 35px; height: 35px; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+        .email-sim { background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 12px; font-family: monospace; font-size: 0.7rem; margin-top: 15px; text-align: left; white-space: pre-wrap; word-break: break-all; }
         @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-        .zone-badge { background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 12px; font-size: 0.65rem; }
+        .toast-msg { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 12px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -81,27 +83,27 @@
                 </div>
                 
                 <div class="role-selector">
-                    <div class="role-btn active" data-role="user" onclick="selectLoginRole('user')"><i class="fas fa-user"></i> User Login</div>
+                    <div class="role-btn active" data-role="user" onclick="selectLoginRole('user')"><i class="fas fa-user"></i> Data Collector Login</div>
                     <div class="role-btn" data-role="admin" onclick="selectLoginRole('admin')"><i class="fas fa-user-shield"></i> Admin Login</div>
                 </div>
 
                 <div id="userLoginForm">
                     <div class="form-group"><label>Email Address</label><input type="email" id="userEmail" placeholder="Enter your email"></div>
                     <div class="form-group"><label>Password</label><input type="password" id="userPassword" placeholder="Enter password"></div>
-                    <button class="btn btn-primary" onclick="loginUser()" style="width:100%;"><i class="fas fa-sign-in-alt"></i> Login as User</button>
+                    <button class="btn btn-primary" onclick="loginUser()" style="width:100%;"><i class="fas fa-sign-in-alt"></i> Login as Data Collector</button>
                     <hr style="margin: 20px 0;">
                     <p>Don't have an account? <a href="#" onclick="showRegister()">Register here</a></p>
                 </div>
 
                 <div id="adminLoginForm" style="display:none;">
-                    <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@example.com"></div>
+                    <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@tarl.com"></div>
                     <div class="form-group"><label>Admin Password</label><input type="password" id="adminPassword" placeholder="Enter password"></div>
                     <button class="btn btn-primary" onclick="loginAdmin()" style="width:100%;"><i class="fas fa-user-shield"></i> Login as Admin</button>
                 </div>
 
                 <div id="registerForm" style="display:none; margin-top:20px;">
                     <hr>
-                    <h3>Register New Account</h3>
+                    <h3>Register New Data Collector Account</h3>
                     <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Your full name"></div>
                     <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" placeholder="Enter your email"></div>
                     <div class="form-group"><label>Password</label><input type="password" id="regPassword" placeholder="Create password"></div>
@@ -118,7 +120,7 @@
     <!-- ADMIN MAIN APP -->
     <div id="adminApp" style="display:none;">
         <div class="header">
-            <div class="logo"><h1><i class="fas fa-user-shield"></i> TaRL Admin Panel</h1><p>Administrator Dashboard | User Management & Approval</p></div>
+            <div class="logo"><h1><i class="fas fa-user-shield"></i> TaRL Admin Panel</h1><p>Administrator Dashboard | Email Approval System</p></div>
             <div class="stats-badge">
                 <div class="badge"><div class="number" id="adminTotalUsers">0</div><div class="label">Total Users</div></div>
                 <div class="badge"><div class="number" id="adminPendingUsers">0</div><div class="label">Pending</div></div>
@@ -129,6 +131,7 @@
         <div class="nav-tabs">
             <button class="nav-btn active" data-section="adminDashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
             <button class="nav-btn" data-section="userManagement"><i class="fas fa-users"></i> User Management</button>
+            <button class="nav-btn" data-section="emailSimulator"><i class="fas fa-envelope"></i> Email Simulator</button>
             <button class="nav-btn" data-section="adminReports"><i class="fas fa-file-alt"></i> Reports</button>
             <button class="nav-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
@@ -144,7 +147,15 @@
         <div id="userManagement" class="section">
             <div class="card">
                 <div class="card-title"><i class="fas fa-users"></i> User Management - Approve/Reject Data Collectors</div>
-                <div style="overflow-x:auto;"><table class="data-table" id="adminUsersTable"><thead><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Role</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminUsersTableBody"></tbody></table></div>
+                <div style="overflow-x:auto;"><table class="data-table" id="adminUsersTable"><thead><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Role</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead><tbody id="adminUsersTableBody"></tbody>}</div>
+            </div>
+        </div>
+
+        <div id="emailSimulator" class="section">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-envelope"></i> Email to Admin (mohammedscho2023@gmail.com)</div>
+                <div class="alert alert-info"><i class="fas fa-info-circle"></i> When a user registers, an approval email is sent to the admin. Click the links below to approve or reject users.</div>
+                <div id="emailSimulatorContent" class="email-sim">No emails sent yet. Register a user to see email simulation.</div>
             </div>
         </div>
 
@@ -190,15 +201,15 @@
 
         <div id="userStudentReg" class="section">
             <div class="card">
-                <div class="card-title"><i class="fas fa-user-plus"></i> Register Student (Data feeds to Woreda & School)</div>
+                <div class="card-title"><i class="fas fa-user-plus"></i> Register Student</div>
                 <div class="grid-3">
-                    <div class="form-group"><label>Zone (Godina)</label><input type="text" id="userStudentZone" readonly style="background:#f1f5f9;"></div>
-                    <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="userStudentWoreda" readonly style="background:#f1f5f9;"></div>
+                    <div class="form-group"><label>Zone</label><input type="text" id="userStudentZone" readonly style="background:#f1f5f9;"></div>
+                    <div class="form-group"><label>Woreda</label><input type="text" id="userStudentWoreda" readonly style="background:#f1f5f9;"></div>
                     <div class="form-group"><label>School ID</label><input type="text" id="userStudentSchoolId" placeholder="School ID"></div>
                     <div class="form-group"><label>School Name</label><input type="text" id="userStudentSchoolName" placeholder="School Name"></div>
                     <div class="form-group"><label>Learner ID</label><input type="text" id="userLearnerId" placeholder="Auto-generated" readonly></div>
                     <div class="form-group"><label>Student Name</label><input type="text" id="userStudentName" placeholder="Full Name"></div>
-                    <div class="form-group"><label>Sex</label><select id="userStudentSex"><option value="M">Male (Dhiirra)</option><option value="F">Female (Dubartii)</option></select></div>
+                    <div class="form-group"><label>Sex</label><select id="userStudentSex"><option value="M">Male</option><option value="F">Female</option></select></div>
                     <div class="form-group"><label>Grade</label><select id="userStudentGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
                     <div class="form-group"><label>Special Needs</label><select id="userSpecialNeeds"><option value="None">None</option><option value="Vision">Vision</option><option value="Hearing">Hearing</option><option value="Physical">Physical</option></select></div>
                 </div>
@@ -220,11 +231,11 @@
                 </div>
                 <button class="btn btn-primary" onclick="registerUserStudent()"><i class="fas fa-save"></i> Register Student</button>
             </div>
-            <div class="card"><div class="card-title"><i class="fas fa-table-list"></i> My Students</div><div style="overflow-x:auto;"><table class="data-table" id="userStudentTable"><thead><tr><th>ID</th><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th><th>Actions</th></tr></thead><tbody id="userStudentTableBody"></tbody></table></div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-table-list"></i> My Students</div><div style="overflow-x:auto;"><table class="data-table" id="userStudentTable"><thead><tr><th>ID</th><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th><th>Actions</th></tr></thead><tbody id="userStudentTableBody"></tbody>}</div></div>
         </div>
 
         <div id="userGrouping" class="section">
-            <div class="card"><div class="card-title"><i class="fas fa-layer-group"></i> Grouping by Grade & TaRL Level</div>
+            <div class="card"><div class="card-title"><i class="fas fa-layer-group"></i> Grouping by Grade & Level</div>
                 <div class="form-group"><label>Select Grade</label><select id="userGroupGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
                 <button class="btn btn-primary" onclick="updateUserGrouping()"><i class="fas fa-chart-line"></i> Show Grouping</button>
                 <div id="userGroupingDisplay" style="margin-top:20px;"></div>
@@ -232,14 +243,14 @@
         </div>
 
         <div id="userWoreda" class="section">
-            <div class="card"><div class="card-title"><i class="fas fa-map-marker-alt"></i> My Woreda Summary (Auto-Generated)</div>
-                <div style="overflow-x:auto;"><table class="data-table" id="userWoredaTable"><thead><tr><th>Zone</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr></thead><tbody id="userWoredaTableBody"></tbody></table></div>
+            <div class="card"><div class="card-title"><i class="fas fa-map-marker-alt"></i> My Woreda Summary</div>
+                <div style="overflow-x:auto;"><table class="data-table" id="userWoredaTable"><thead><tr><th>Zone</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr></thead><tbody id="userWoredaTableBody"></tbody>}</div>
             </div>
         </div>
 
         <div id="userSchool" class="section">
             <div class="card"><div class="card-title"><i class="fas fa-school"></i> My Schools Summary</div>
-                <div style="overflow-x:auto;"><table class="data-table" id="userSchoolTable"><thead><tr><th>School</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr></thead><tbody id="userSchoolTableBody"></tbody></table></div>
+                <div style="overflow-x:auto;"><table class="data-table" id="userSchoolTable"><thead><tr><th>School</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th></tr></thead><tbody id="userSchoolTableBody"></tbody>}</div>
             </div>
         </div>
 
@@ -250,7 +261,7 @@
                 <button class="btn btn-primary" onclick="generateUserReport()"><i class="fas fa-download"></i> Generate Report</button>
             </div>
         </div>
-        <div class="footer"><p>TaRL Department | Data Collectors only see their approved Zone & Woreda</p></div>
+        <div class="footer"><p>TaRL Department | Data Collectors only see their approved Zone & Woreda | Admin: mohammedscho2023@gmail.com</p></div>
     </div>
 </div>
 
@@ -260,22 +271,24 @@
     let students = [];
     let currentUser = null;
     let activityLog = [];
+    let pendingEmails = [];
 
-    const ADMIN_EMAIL = "admin@tarl.com";
+    const ADMIN_EMAIL = "mohammedscho2023@gmail.com";
     const ADMIN_PASSWORD = "admin123";
 
     function saveData() {
         localStorage.setItem('tarl_users', JSON.stringify(users));
         localStorage.setItem('tarl_students', JSON.stringify(students));
         localStorage.setItem('tarl_activity', JSON.stringify(activityLog));
+        localStorage.setItem('tarl_pendingEmails', JSON.stringify(pendingEmails));
     }
 
     function loadData() {
         users = JSON.parse(localStorage.getItem('tarl_users') || '[]');
         students = JSON.parse(localStorage.getItem('tarl_students') || '[]');
         activityLog = JSON.parse(localStorage.getItem('tarl_activity') || '[]');
+        pendingEmails = JSON.parse(localStorage.getItem('tarl_pendingEmails') || '[]');
         
-        // Create default admin if none exists
         if(!users.find(u => u.role === 'admin')) {
             users.push({ id: 'ADMIN_1', name: 'System Administrator', email: ADMIN_EMAIL, password: btoa(ADMIN_PASSWORD), role: 'admin', zone: '', woreda: '', status: 'approved', registeredAt: new Date().toISOString() });
             saveData();
@@ -287,6 +300,118 @@
         activityLog.unshift({ message, timestamp: new Date().toISOString() });
         if(activityLog.length > 50) activityLog.pop();
         saveData();
+        updateAdminActivityLog();
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function sendApprovalEmail(user) {
+        const approveLink = `#approve_${user.id}`;
+        const rejectLink = `#reject_${user.id}`;
+        const emailContent = `
+╔══════════════════════════════════════════════════════════════════╗
+║           T a R L   D e p a r t m e n t   -   A d m i n         ║
+╠══════════════════════════════════════════════════════════════════╣
+║  To: ${ADMIN_EMAIL}                                              ║
+║  Subject: NEW USER REGISTRATION - ACTION REQUIRED                ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  A new Data Collector has registered for the TaRL system.        ║
+║                                                                  ║
+║  ┌─────────────────────────────────────────────────────────────┐ ║
+║  │  USER DETAILS:                                              │ ║
+║  │  Name:   ${user.name.padEnd(30)}│ ║
+║  │  Email:  ${user.email.padEnd(30)}│ ║
+║  │  Zone:   ${user.zone.padEnd(30)}│ ║
+║  │  Woreda: ${user.woreda.padEnd(30)}│ ║
+║  │  Role:   Data Collector                                     │ ║
+║  └─────────────────────────────────────────────────────────────┘ ║
+║                                                                  ║
+║  ┌─────────────────────────────────────────────────────────────┐ ║
+║  │  ACTION REQUIRED:                                           │ ║
+║  │                                                             │ ║
+║  │  ✅ APPROVE: Click the button below in Admin Panel          │ ║
+║  │  ❌ REJECT:  Click the reject button in Admin Panel         │ ║
+║  │                                                             │ ║
+║  │  You can also manage this user in the User Management       │ ║
+║  │  section of the Admin Panel.                                │ ║
+║  └─────────────────────────────────────────────────────────────┘ ║
+║                                                                  ║
+║  ┌─────────────────────────────────────────────────────────────┐ ║
+║  │  QUICK LINKS (Click in Admin Panel):                        │ ║
+║  │  • Go to User Management                                     │ ║
+║  │  • Find user: ${user.email}                                  │ ║
+║  │  • Click Approve or Reject                                   │ ║
+║  └─────────────────────────────────────────────────────────────┘ ║
+║                                                                  ║
+║  Regards,                                                        ║
+║  TaRL Department System                                          ║
+║  This is an automated message.                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+        `;
+        
+        pendingEmails.unshift({ userId: user.id, email: user.email, name: user.name, zone: user.zone, woreda: user.woreda, timestamp: new Date().toISOString() });
+        saveData();
+        updateEmailSimulator();
+        logActivity(`Approval email sent to admin for user: ${user.name} (${user.email})`);
+        showToast(`Email sent to ${ADMIN_EMAIL} for approval`);
+    }
+
+    function updateEmailSimulator() {
+        const container = document.getElementById('emailSimulatorContent');
+        if(!container) return;
+        if(pendingEmails.length === 0) {
+            container.innerHTML = 'No pending approval emails. When users register, emails will appear here.';
+            return;
+        }
+        let html = '';
+        pendingEmails.forEach(email => {
+            html += `
+            <div style="background:#0f172a; margin-bottom:15px; padding:12px; border-radius:8px; border-left:4px solid #10b981;">
+                <div><i class="fas fa-envelope"></i> <strong>To: mohammedscho2023@gmail.com</strong></div>
+                <div><i class="fas fa-user"></i> User: ${email.name} (${email.email})</div>
+                <div><i class="fas fa-map-marker-alt"></i> Zone: ${email.zone} | Woreda: ${email.woreda}</div>
+                <div><i class="fas fa-clock"></i> Requested: ${new Date(email.timestamp).toLocaleString()}</div>
+                <div style="margin-top:10px;">
+                    <button class="btn btn-success btn-sm" onclick="quickApprove('${email.userId}')"><i class="fas fa-check"></i> Approve via Email</button>
+                    <button class="btn btn-danger btn-sm" onclick="quickReject('${email.userId}')"><i class="fas fa-times"></i> Reject via Email</button>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function quickApprove(userId) {
+        const user = users.find(u => u.id === userId);
+        if(user && user.status === 'pending') {
+            user.status = 'approved';
+            pendingEmails = pendingEmails.filter(e => e.userId !== userId);
+            saveData();
+            logActivity(`User ${user.name} (${user.email}) was APPROVED via email link`);
+            updateAdminApp();
+            updateEmailSimulator();
+            showToast(`${user.name} approved successfully!`);
+        }
+    }
+
+    function quickReject(userId) {
+        const user = users.find(u => u.id === userId);
+        if(user) {
+            users = users.filter(u => u.id !== userId);
+            pendingEmails = pendingEmails.filter(e => e.userId !== userId);
+            saveData();
+            logActivity(`User ${user?.name} was REJECTED via email link`);
+            updateAdminApp();
+            updateEmailSimulator();
+            showToast(`${user?.name} rejected.`, 'error');
+        }
     }
 
     let selectedLoginRole = 'user';
@@ -322,7 +447,8 @@
         users.push(newUser);
         saveData();
         logActivity(`New registration request: ${name} (${email}) - Zone: ${zone}, Woreda: ${woreda}`);
-        alert(`Registration submitted! Waiting for admin approval.\n\nYou will be notified when approved.`);
+        sendApprovalEmail(newUser);
+        alert(`Registration submitted! An approval email has been sent to the admin (${ADMIN_EMAIL}).\n\nYou will be notified when approved.`);
         showLoginForm();
         document.getElementById('regName').value = '';
         document.getElementById('regEmail').value = '';
@@ -341,7 +467,7 @@
             logActivity(`${user.name} (${user.zone}/${user.woreda}) logged in`);
             showUserApp();
         } else if(user && user.status === 'pending') {
-            alert('Your account is pending admin approval.');
+            alert('Your account is pending admin approval. Please wait for confirmation email.');
         } else {
             alert('Invalid email or password');
         }
@@ -356,7 +482,7 @@
             logActivity(`Admin ${admin.name} logged in`);
             showAdminApp();
         } else {
-            alert('Invalid admin credentials');
+            alert('Invalid admin credentials. Use: admin@tarl.com / admin123');
         }
     }
 
@@ -377,6 +503,7 @@
         document.getElementById('adminApp').style.display = 'block';
         document.getElementById('adminName').innerText = currentUser.name;
         updateAdminApp();
+        updateEmailSimulator();
     }
 
     function logout() {
@@ -392,7 +519,6 @@
         selectLoginRole('user');
     }
 
-    // Helper Functions
     function getEnglishLevel(score) {
         if(score === 0) return { name: 'Beginner', class: 'level-1', code: 1 };
         if(score === 1) return { name: 'Alphabet', class: 'level-2', code: 2 };
@@ -421,7 +547,6 @@
         
         document.getElementById('adminUserStats').innerHTML = `<div class="alert alert-info">Total Data Collectors: ${approvedUsers.length}<br>Approved: ${approvedUsers.filter(u=>u.status==='approved').length}<br>Pending: ${pendingUsers.length}</div>`;
         document.getElementById('adminSchoolStats').innerHTML = `<div class="alert alert-success">Total Students: ${students.length}<br>Schools: ${[...new Set(students.map(s=>s.schoolName))].length}<br>Woredas: ${[...new Set(students.map(s=>s.woreda))].length}</div>`;
-        document.getElementById('adminActivityLog').innerHTML = '<div style="max-height:300px; overflow-y:auto;">' + activityLog.slice(0,15).map(log => `<div style="padding:5px; border-bottom:1px solid #e2e8f0; font-size:0.7rem;">${new Date(log.timestamp).toLocaleString()}: ${log.message}</div>`).join('') + '</div>';
         
         const tbody = document.getElementById('adminUsersTableBody');
         tbody.innerHTML = '';
@@ -435,14 +560,37 @@
         });
     }
 
+    function updateAdminActivityLog() {
+        const container = document.getElementById('adminActivityLog');
+        if(container) {
+            container.innerHTML = '<div style="max-height:300px; overflow-y:auto;">' + activityLog.slice(0,15).map(log => `<div style="padding:5px; border-bottom:1px solid #e2e8f0; font-size:0.7rem;">${new Date(log.timestamp).toLocaleString()}: ${log.message}</div>`).join('') + '</div>';
+        }
+    }
+
     function approveUser(userId) {
         const user = users.find(u => u.id === userId);
-        if(user) { user.status = 'approved'; saveData(); logActivity(`User ${user.name} (${user.zone}/${user.woreda}) was APPROVED`); updateAdminApp(); alert(`${user.name} approved!`); }
+        if(user) { 
+            user.status = 'approved'; 
+            pendingEmails = pendingEmails.filter(e => e.userId !== userId);
+            saveData(); 
+            logActivity(`User ${user.name} (${user.zone}/${user.woreda}) was APPROVED`); 
+            updateAdminApp(); 
+            updateEmailSimulator();
+            showToast(`${user.name} approved!`);
+        }
     }
 
     function rejectUser(userId) {
         const user = users.find(u => u.id === userId);
-        if(user) { users = users.filter(u => u.id !== userId); saveData(); logActivity(`User ${user.name} was REJECTED`); updateAdminApp(); alert(`${user.name} rejected.`); }
+        if(user) { 
+            users = users.filter(u => u.id !== userId); 
+            pendingEmails = pendingEmails.filter(e => e.userId !== userId);
+            saveData(); 
+            logActivity(`User ${user.name} was REJECTED`); 
+            updateAdminApp(); 
+            updateEmailSimulator();
+            showToast(`${user.name} rejected.`, 'error');
+        }
     }
 
     function deleteUser(userId) {
@@ -452,7 +600,7 @@
             saveData();
             logActivity(`User ${user?.name} was DELETED`);
             updateAdminApp();
-            alert('User deleted');
+            showToast(`${user?.name} deleted.`);
         }
     }
 
@@ -461,18 +609,16 @@
         let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaRL Admin Report</title><style>body{font-family:Arial;margin:40px;}</style></head><body>
         <h1>TaRL Department - Admin Report</h1><p>Generated: ${new Date().toLocaleString()}</p>
         <h2>Users</h2><table border="1"><tr><th>Name</th><th>Email</th><th>Zone</th><th>Woreda</th><th>Status</th></tr>`;
-        users.filter(u=>u.role==='data_collector').forEach(u => html += `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.zone}</td><td>${u.woreda}</td><td>${u.status}</td></tr>`);
+        users.filter(u=>u.role==='data_collector').forEach(u => html += `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.zone}</td><td>${u.woreda}</td><td>${u.status}</td>`);
         html += `</table><h2>Students</h2><table border="1"><tr><th>Name</th><th>School</th><th>Zone</th><th>Woreda</th><th>English</th><th>Oromo</th></tr>`;
-        students.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>${s.zone}</td><td>${s.woreda}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td></tr>`);
+        students.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>${s.zone}</td><td>${s.woreda}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td>`);
         html += `</table></body></html>`;
         if(format === 'html') { const w=window.open(); w.document.write(html); w.document.close(); }
         else { const div=document.createElement('div'); div.innerHTML=html; document.body.appendChild(div); html2pdf().from(div).set({margin:1}).save(); setTimeout(()=>document.body.removeChild(div),1000); }
     }
 
-    // USER FUNCTIONS (Data Collector - Zone/Woreda Restricted)
-    function getUserStudents() {
-        return students.filter(s => s.zone === currentUser.zone && s.woreda === currentUser.woreda);
-    }
+    // USER FUNCTIONS
+    function getUserStudents() { return students.filter(s => s.zone === currentUser.zone && s.woreda === currentUser.woreda); }
 
     function registerUserStudent() {
         const learnerId = 'LRN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4).toUpperCase();
@@ -492,8 +638,8 @@
         });
         saveData();
         updateUserApp();
-        alert(`Student registered! ID: ${learnerId}`);
-        logActivity(`${currentUser.name} registered student: ${document.getElementById('userStudentName').value} in ${currentUser.zone}/${currentUser.woreda}`);
+        showToast(`Student ${document.getElementById('userStudentName').value} registered!`);
+        logActivity(`${currentUser.name} registered student: ${document.getElementById('userStudentName').value}`);
         clearUserStudentForm();
     }
 
@@ -512,7 +658,6 @@
         document.getElementById('userAvgEnglish').textContent = userStudents.length ? ((eng/(userStudents.length*5))*100).toFixed(0) : '0';
         document.getElementById('userAvgOromo').textContent = userStudents.length ? ((oro/(userStudents.length*5))*100).toFixed(0) : '0';
         
-        // Student Table
         const tbody = document.getElementById('userStudentTableBody');
         tbody.innerHTML = '';
         userStudents.forEach(s => {
@@ -522,35 +667,20 @@
             <td><button class="btn btn-danger btn-sm" onclick="deleteUserStudent('${s.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
         });
         
-        // Woreda Table
         const wMap = new Map();
-        userStudents.forEach(s => {
-            const key = `${s.zone}|${s.woreda}|${s.grade}`;
-            if(!wMap.has(key)) wMap.set(key, { zone:s.zone, woreda:s.woreda, grade:s.grade, count:0, eng:0, oro:0 });
-            const d = wMap.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore;
-        });
+        userStudents.forEach(s => { const key = `${s.zone}|${s.woreda}|${s.grade}`; if(!wMap.has(key)) wMap.set(key, { zone:s.zone, woreda:s.woreda, grade:s.grade, count:0, eng:0, oro:0 }); const d = wMap.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
         const wTbody = document.getElementById('userWoredaTableBody');
         wTbody.innerHTML = '';
-        for(let d of wMap.values()) {
-            wTbody.innerHTML += `<tr><td>${d.zone}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
-            <td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
-        }
+        for(let d of wMap.values()) { wTbody.innerHTML += `<tr><td>${d.zone}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
+        <td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`; }
         
-        // School Table
         const sMap = new Map();
-        userStudents.forEach(s => {
-            const key = `${s.schoolName}|${s.grade}`;
-            if(!sMap.has(key)) sMap.set(key, { school:s.schoolName, woreda:s.woreda, grade:s.grade, count:0, eng:0, oro:0 });
-            const d = sMap.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore;
-        });
+        userStudents.forEach(s => { const key = `${s.schoolName}|${s.grade}`; if(!sMap.has(key)) sMap.set(key, { school:s.schoolName, woreda:s.woreda, grade:s.grade, count:0, eng:0, oro:0 }); const d = sMap.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
         const sTbody = document.getElementById('userSchoolTableBody');
         sTbody.innerHTML = '';
-        for(let d of sMap.values()) {
-            sTbody.innerHTML += `<tr><td>${d.school}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
-            <td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
-        }
+        for(let d of sMap.values()) { sTbody.innerHTML += `<tr><td>${d.school}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td>
+        <td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`; }
         
-        // Charts
         const grades = ['3','4','5'];
         const engData = grades.map(g => { const gs = userStudents.filter(s=>s.grade===g); if(gs.length===0) return 0; return (gs.reduce((sum,st)=>sum+st.englishScore,0)/(gs.length*5))*100; });
         const oromoData = grades.map(g => { const gs = userStudents.filter(s=>s.grade===g); if(gs.length===0) return 0; return (gs.reduce((sum,st)=>sum+st.oromoScore,0)/(gs.length*5))*100; });
@@ -565,11 +695,9 @@
         window.userLevelChart = new Chart(document.getElementById('userLevelChart'), { type: 'pie', data: { labels: ['Beginner','Alphabet','Words','Sentence','Story','Computed'], datasets: [{ data: levelCounts, backgroundColor: ['#ef4444','#f59e0b','#fef3c7','#d1fae5','#dbeafe','#e0e7ff'] }] } });
         
         const total = userStudents.length;
-        const males = userStudents.filter(s=>s.sex==='M').length;
-        const females = userStudents.filter(s=>s.sex==='F').length;
         const avgEng = total ? (userStudents.reduce((s,st)=>s+st.englishScore,0)/total)*20 : 0;
         const avgOro = total ? (userStudents.reduce((s,st)=>s+st.oromoScore,0)/total)*20 : 0;
-        document.getElementById('userProgramSummary').innerHTML = `<div class="grid-3"><div class="alert alert-info"><strong>My Enrollment</strong><br>Total: ${total}<br>Male: ${males}<br>Female: ${females}</div>
+        document.getElementById('userProgramSummary').innerHTML = `<div class="grid-3"><div class="alert alert-info"><strong>My Enrollment</strong><br>Total: ${total}</div>
         <div class="alert alert-success"><strong>My Average Scores</strong><br>English: ${avgEng.toFixed(1)}%<br>Afaan Oromoo: ${avgOro.toFixed(1)}%</div>
         <div class="alert alert-info"><strong>My Coverage</strong><br>Schools: ${[...new Set(userStudents.map(s=>s.schoolName))].length}<br>Woreda: ${currentUser.woreda}</div></div>`;
     }
@@ -584,9 +712,7 @@
         gradeStudents.forEach(s => groups[s.englishLevel.code].push(s.name));
         let html = '<div><h4>English Grouping</h4>';
         const levelNames = ['Beginner','Alphabet','Words','Sentence','Story','Computed'];
-        for(let i=1;i<=6;i++) {
-            if(groups[i].length > 0) html += `<div class="group-card"><strong>Level ${i}: ${levelNames[i-1]}</strong> (${groups[i].length})<br><small>${groups[i].join(', ')}</small></div>`;
-        }
+        for(let i=1;i<=6;i++) { if(groups[i].length > 0) html += `<div class="group-card"><strong>Level ${i}: ${levelNames[i-1]}</strong> (${groups[i].length})<br><small>${groups[i].join(', ')}</small></div>`; }
         html += '</div>';
         container.innerHTML = html;
     }
@@ -600,17 +726,17 @@
         if(type === 'woreda') {
             const map = new Map();
             userStudents.forEach(s => { const key = `${s.grade}`; if(!map.has(key)) map.set(key, { grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
-            html += `<h2>Woreda Summary (${currentUser.woreda})</h2><table><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
+            html += `<h2>Woreda Summary</h2><table border="1"><tr><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
             for(let d of map.values()) html += `<tr><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
-            html += ` licensierad`;
+            html += `</table>`;
         } else if(type === 'school') {
             const map = new Map();
             userStudents.forEach(s => { const key = `${s.schoolName}|${s.grade}`; if(!map.has(key)) map.set(key, { school:s.schoolName, grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
-            html += `<h2>School Summary</h2><tr><th>School</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
+            html += `<h2>School Summary</h2><table border="1"><tr><th>School</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
             for(let d of map.values()) html += `<tr><td>${d.school}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
             html += `</table>`;
         } else {
-            html += `<h2>Student Roster</h2><table><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th>`;
+            html += `<h2>Student Roster</h2><table border="1"><tr><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th>`;
             userStudents.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td></tr>`);
             html += `</table>`;
         }
@@ -619,10 +745,8 @@
         else { const div=document.createElement('div'); div.innerHTML=html; document.body.appendChild(div); html2pdf().from(div).set({margin:1}).save(); setTimeout(()=>document.body.removeChild(div),1000); }
     }
 
-    function updateAll() { /* placeholder */ }
     function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
 
-    // Navigation
     document.addEventListener('click', function(e) {
         if(e.target.closest('.nav-btn') && !e.target.closest('.nav-btn').getAttribute('onclick')) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -633,6 +757,7 @@
         }
     });
 
+    function updateAll() { }
     loadData();
     selectLoginRole('user');
 </script>
