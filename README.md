@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaRL Department | English & Afaan Oromoo | Teaching at the Right Level</title>
+    <title>TaRL Department | English & Afaan Oromoo | Student Registration to Woreda/School Feed</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -57,19 +57,21 @@
         .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
         .formula-box { background: #fef3c7; padding: 8px; border-radius: 8px; font-family: monospace; font-size: 0.7rem; margin-top: 8px; }
         .footer { text-align: center; padding: 20px; color: rgba(255,255,255,0.5); font-size: 0.7rem; }
-        .literacy-level { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
+        .level-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
         .level-1 { background: #fee2e2; color: #991b1b; }
         .level-2 { background: #fed7aa; color: #9a3412; }
         .level-3 { background: #fef3c7; color: #92400e; }
         .level-4 { background: #d1fae5; color: #065f46; }
         .level-5 { background: #dbeafe; color: #1e40af; }
+        .level-6 { background: #e0e7ff; color: #3730a3; }
+        .group-card { background: #f8fafc; border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 4px solid #2563eb; }
         @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .data-table { font-size: 0.55rem; } }
     </style>
 </head>
 <body>
 <div class="dashboard-container">
     <div class="header">
-        <div class="logo"><h1><i class="fas fa-language"></i> TaRL Department</h1><p>Teaching at the Right Level | English & Afaan Oromoo | 5 Components Each</p></div>
+        <div class="logo"><h1><i class="fas fa-chalkboard-user"></i> TaRL Department</h1><p>Teaching at the Right Level | Student Registration → Woreda/School Feed | Grouping by Grade & Level</p></div>
         <div class="stats-badge">
             <div class="badge"><div class="number" id="totalStudents">0</div><div class="label">Total Students</div></div>
             <div class="badge"><div class="number" id="totalSchools">0</div><div class="label">Schools</div></div>
@@ -80,160 +82,93 @@
 
     <div class="nav-tabs">
         <button class="nav-btn active" data-section="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
-        <button class="nav-btn" data-section="woreda"><i class="fas fa-map-marker-alt"></i> Woreda Level</button>
-        <button class="nav-btn" data-section="school"><i class="fas fa-school"></i> School Level</button>
-        <button class="nav-btn" data-section="student"><i class="fas fa-user-graduate"></i> Student Registration</button>
-        <button class="nav-btn" data-section="assessment"><i class="fas fa-clipboard-list"></i> Assessment Tools</button>
+        <button class="nav-btn" data-section="studentReg"><i class="fas fa-user-plus"></i> Student Registration</button>
+        <button class="nav-btn" data-section="grouping"><i class="fas fa-layer-group"></i> Grouping by Grade & Level</button>
+        <button class="nav-btn" data-section="woreda"><i class="fas fa-map-marker-alt"></i> Woreda Level (Auto-Feed)</button>
+        <button class="nav-btn" data-section="school"><i class="fas fa-school"></i> School Level (Auto-Feed)</button>
         <button class="nav-btn" data-section="reports"><i class="fas fa-file-alt"></i> Reports</button>
-        <button class="nav-btn" data-section="import"><i class="fas fa-upload"></i> Import Data</button>
         <button class="nav-btn" data-section="settings"><i class="fas fa-cog"></i> Settings</button>
     </div>
 
     <!-- DASHBOARD SECTION -->
     <div id="dashboard" class="section active">
         <div class="grid-3">
-            <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> English Progress</div><div class="chart-container" style="height:250px;"><canvas id="englishChart"></canvas></div></div>
-            <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> Afaan Oromoo Progress</div><div class="chart-container" style="height:250px;"><canvas id="oromoChart"></canvas></div></div>
-            <div class="card"><div class="card-title"><i class="fas fa-chart-pie"></i> English Level Distribution</div><div class="chart-container" style="height:250px;"><canvas id="englishLevelChart"></canvas></div></div>
-        </div>
-        <div class="grid-2">
-            <div class="card"><div class="card-title"><i class="fas fa-chart-bar"></i> Performance by Grade</div><div class="chart-container" style="height:250px;"><canvas id="gradePerformanceChart"></canvas></div></div>
-            <div class="card"><div class="card-title"><i class="fas fa-chart-simple"></i> Baseline vs Current Progress</div><div class="chart-container" style="height:250px;"><canvas id="baselineProgressChart"></canvas></div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> English Progress by Grade</div><div class="chart-container" style="height:250px;"><canvas id="englishGradeChart"></canvas></div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> Afaan Oromoo Progress by Grade</div><div class="chart-container" style="height:250px;"><canvas id="oromoGradeChart"></canvas></div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-chart-pie"></i> Student Distribution by Level</div><div class="chart-container" style="height:250px;"><canvas id="levelDistributionChart"></canvas></div></div>
         </div>
         <div class="card"><div class="card-title"><i class="fas fa-tachometer-alt"></i> TaRL Program Summary</div><div id="programSummary"></div></div>
     </div>
 
-    <!-- WOREDA LEVEL DATA SECTION -->
-    <div id="woreda" class="section">
+    <!-- STUDENT REGISTRATION SECTION - Feeds to Woreda & School -->
+    <div id="studentReg" class="section">
         <div class="card">
-            <div class="card-title"><i class="fas fa-plus-circle"></i> Add Woreda Level Data</div>
-            <div class="grid-3">
-                <div class="form-group"><label>Zone (Godina)</label><input type="text" id="woredaZone" placeholder="e.g., East Wolega"></div>
-                <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="woredaName" placeholder="e.g., Leka Dulecha"></div>
-                <div class="form-group"><label>Number of Schools</label><input type="number" id="woredaSchools" placeholder="0"></div>
-                <div class="form-group"><label>Assessment Phase</label><select id="woredaPhase"><option value="baseline">Baseline (Ka'umsa)</option><option value="midline">Midline (Jidduu)</option><option value="endline">Endline (Xumura)</option></select></div>
-                <div class="form-group"><label>Grade</label><select id="woredaGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
-                <div class="form-group"><label>Total Students</label><input type="number" id="woredaTotalStudents" placeholder="0"></div>
-            </div>
-            <div class="grid-2">
-                <!-- ENGLISH SECTION (replaces Maths) - 5 components -->
-                <div><h4><i class="fas fa-language"></i> English (5 Components)</h4>
-                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial Grade / Baseline)</label><input type="number" id="woredaEngInitial" placeholder="0"></div>
-                    <div class="form-group"><label>Arfii (Alphabet / Letter Recognition)</label><input type="number" id="woredaEngAlphabet" placeholder="0"></div>
-                    <div class="form-group"><label>Jechoota (Word Recognition / Vocabulary)</label><input type="number" id="woredaEngWords" placeholder="0"></div>
-                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence Reading)</label><input type="number" id="woredaEngSentence" placeholder="0"></div>
-                    <div class="form-group"><label>Seenessaa (Story / Reading Comprehension)</label><input type="number" id="woredaEngStory" placeholder="0"></div>
-                </div>
-                <!-- AFAAN OROMOO SECTION - 5 components -->
-                <div><h4><i class="fas fa-book"></i> Afaan Oromoo (5 Components)</h4>
-                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial Grade)</label><input type="number" id="woredaLitInitial" placeholder="0"></div>
-                    <div class="form-group"><label>Qubee (Alphabet Recognition)</label><input type="number" id="woredaLitQubee" placeholder="0"></div>
-                    <div class="form-group"><label>Jecha (Word Recognition)</label><input type="number" id="woredaLitWord" placeholder="0"></div>
-                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence)</label><input type="number" id="woredaLitSentence" placeholder="0"></div>
-                    <div class="form-group"><label>Seenessaa (Story / Comprehension)</label><input type="number" id="woredaLitStory" placeholder="0"></div>
-                </div>
-            </div>
-            <button class="btn btn-primary" onclick="addWoredaData()"><i class="fas fa-save"></i> Save Woreda Data</button>
-        </div>
-        <div class="card">
-            <div class="card-title"><i class="fas fa-table"></i> Woreda Level Summary</div>
-            <div style="overflow-x: auto;"><table class="data-table" id="woredaTable"><thead><tr><th>Zone</th><th>Woreda</th><th>Schools</th><th>Phase</th><th>Grade</th><th>Total Students</th><th>English Score</th><th>Afaan Oromoo Score</th><th>Actions</th></tr></thead><tbody id="woredaTableBody"></tbody></table></div>
-        </div>
-    </div>
-
-    <!-- SCHOOL LEVEL DATA SECTION -->
-    <div id="school" class="section">
-        <div class="card">
-            <div class="card-title"><i class="fas fa-plus-circle"></i> Add School Level Data</div>
-            <div class="grid-3">
-                <div class="form-group"><label>Zone (Godina)</label><input type="text" id="schoolZone" placeholder="e.g., East Wolega"></div>
-                <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="schoolWoreda" placeholder="e.g., Leka Dulecha"></div>
-                <div class="form-group"><label>School ID</label><input type="text" id="schoolId" placeholder="School ID"></div>
-                <div class="form-group"><label>School Name</label><input type="text" id="schoolName" placeholder="School Name"></div>
-                <div class="form-group"><label>Grade (Kutaa)</label><select id="schoolGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
-                <div class="form-group"><label>Assessment Phase</label><select id="schoolPhase"><option value="baseline">Baseline</option><option value="midline">Midline</option><option value="endline">Endline</option></select></div>
-            </div>
-            <div class="grid-2">
-                <div><h4><i class="fas fa-language"></i> English Scores (5 Components)</h4>
-                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial)</label><input type="number" id="schoolEngInitial" placeholder="0"></div>
-                    <div class="form-group"><label>Arfii (Alphabet)</label><input type="number" id="schoolEngAlphabet" placeholder="0"></div>
-                    <div class="form-group"><label>Jechoota (Words)</label><input type="number" id="schoolEngWords" placeholder="0"></div>
-                    <div class="form-group"><label>Keeyyata Salphaa (Sentence)</label><input type="number" id="schoolEngSentence" placeholder="0"></div>
-                    <div class="form-group"><label>Seenessaa (Story)</label><input type="number" id="schoolEngStory" placeholder="0"></div>
-                </div>
-                <div><h4><i class="fas fa-book"></i> Afaan Oromoo Scores (5 Components)</h4>
-                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial)</label><input type="number" id="schoolLitInitial" placeholder="0"></div>
-                    <div class="form-group"><label>Qubee</label><input type="number" id="schoolLitQubee" placeholder="0"></div>
-                    <div class="form-group"><label>Jecha</label><input type="number" id="schoolLitWord" placeholder="0"></div>
-                    <div class="form-group"><label>Keeyyata Salphaa</label><input type="number" id="schoolLitSentence" placeholder="0"></div>
-                    <div class="form-group"><label>Seenessaa</label><input type="number" id="schoolLitStory" placeholder="0"></div>
-                </div>
-            </div>
-            <button class="btn btn-primary" onclick="addSchoolData()"><i class="fas fa-save"></i> Save School Data</button>
-        </div>
-        <div class="card">
-            <div class="card-title"><i class="fas fa-table"></i> School Level Data</div>
-            <div style="overflow-x: auto;"><table class="data-table" id="schoolTable"><thead><tr><th>Zone</th><th>Woreda</th><th>School Name</th><th>Grade</th><th>Phase</th><th>English Total</th><th>Afaan Oromoo Total</th><th>Actions</th></tr></thead><tbody id="schoolTableBody"></tbody></table></div>
-        </div>
-    </div>
-
-    <!-- STUDENT REGISTRATION SECTION -->
-    <div id="student" class="section">
-        <div class="card">
-            <div class="card-title"><i class="fas fa-user-plus"></i> Register Student (Barataa)</div>
+            <div class="card-title"><i class="fas fa-user-plus"></i> Register Student (Barataa) - Data Feeds to Woreda & School Levels</div>
             <div class="grid-3">
                 <div class="form-group"><label>Zone (Godina)</label><input type="text" id="studentZone" placeholder="e.g., East Wolega"></div>
                 <div class="form-group"><label>Woreda (Aanaa)</label><input type="text" id="studentWoreda" placeholder="e.g., Leka Dulecha"></div>
                 <div class="form-group"><label>School ID</label><input type="text" id="studentSchoolId" placeholder="School ID"></div>
                 <div class="form-group"><label>School Name</label><input type="text" id="studentSchoolName" placeholder="School Name"></div>
                 <div class="form-group"><label>Learner ID</label><input type="text" id="learnerId" placeholder="Auto-generated" readonly></div>
-                <div class="form-group"><label>Student Name</label><input type="text" id="studentName" placeholder="Full Name"></div>
+                <div class="form-group"><label>Student Name (Maqaa Barataa)</label><input type="text" id="studentName" placeholder="Full Name"></div>
                 <div class="form-group"><label>Sex</label><select id="studentSex"><option value="M">Dhiirra (Male)</option><option value="F">Dubartii (Female)</option></select></div>
                 <div class="form-group"><label>Grade (Kutaa)</label><select id="studentGrade"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
                 <div class="form-group"><label>Special Needs (Fedhii Addaa)</label><select id="specialNeeds"><option value="None">None</option><option value="Vision">Rakkoo Arguu (Vision)</option><option value="Hearing">Rakkoo Dhaga'uu (Hearing)</option><option value="Physical">Hirdhiina Qaamaa (Physical)</option><option value="Communication">Rakkoo Waliifgaluu (Communication)</option><option value="Cognitive">Hanqiina Guddina Sammu (Cognitive)</option><option value="Behavioral">Rakkoo Amalaa (Behavioral)</option></select></div>
             </div>
             <div class="grid-2">
-                <!-- ENGLISH ASSESSMENT - 5 components -->
+                <!-- ENGLISH ASSESSMENT - 5 components (Beginners instead of Initial) -->
                 <div><h4><i class="fas fa-language"></i> English Assessment (5 Components)</h4>
-                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial Grade)</label><input type="number" id="studentEngInitial" placeholder="0/1" step="1" min="0" max="1"></div>
-                    <div class="form-group"><label>Arfii (Alphabet Recognition)</label><input type="number" id="studentEngAlphabet" placeholder="0/1" step="1" min="0" max="1"></div>
-                    <div class="form-group"><label>Jechoota (Word Recognition)</label><input type="number" id="studentEngWords" placeholder="0/1" step="1" min="0" max="1"></div>
-                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence)</label><input type="number" id="studentEngSentence" placeholder="0/1" step="1" min="0" max="1"></div>
-                    <div class="form-group"><label>Seenessaa (Story Comprehension)</label><input type="number" id="studentEngStory" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Beginners (Gulantaa Jalqabaa / Baseline)</label><input type="number" id="studentEngBeginners" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Arfii (Alphabet / Letter Recognition)</label><input type="number" id="studentEngAlphabet" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Jechoota (Word Recognition / Vocabulary)</label><input type="number" id="studentEngWords" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence Reading)</label><input type="number" id="studentEngSentence" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Seenessaa (Story / Reading Comprehension)</label><input type="number" id="studentEngStory" placeholder="0/1" step="1" min="0" max="1"></div>
                 </div>
-                <!-- AFAAN OROMOO ASSESSMENT - 5 components -->
+                <!-- AFAAN OROMOO ASSESSMENT - 5 components (Beginners instead of Initial) -->
                 <div><h4><i class="fas fa-book"></i> Afaan Oromoo Assessment (5 Components)</h4>
-                    <div class="form-group"><label>Gulantaa Jalqabaa (Initial Grade)</label><input type="number" id="studentLitInitial" placeholder="0/1" step="1" min="0" max="1"></div>
-                    <div class="form-group"><label>Qubee (Alphabet Recognition)</label><input type="number" id="studentLitQubee" placeholder="0/1" step="1" min="0" max="1"></div>
-                    <div class="form-group"><label>Jecha (Word Recognition)</label><input type="number" id="studentLitWord" placeholder="0/1" step="1" min="0" max="1"></div>
-                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence)</label><input type="number" id="studentLitSentence" placeholder="0/1" step="1" min="0" max="1"></div>
-                    <div class="form-group"><label>Seenessaa (Story Comprehension)</label><input type="number" id="studentLitStory" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Beginners (Gulantaa Jalqabaa / Baseline)</label><input type="number" id="studentOromoBeginners" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Qubee (Alphabet Recognition)</label><input type="number" id="studentOromoQubee" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Jecha (Word Recognition)</label><input type="number" id="studentOromoWord" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Keeyyata Salphaa (Simple Sentence)</label><input type="number" id="studentOromoSentence" placeholder="0/1" step="1" min="0" max="1"></div>
+                    <div class="form-group"><label>Seenessaa (Story / Comprehension)</label><input type="number" id="studentOromoStory" placeholder="0/1" step="1" min="0" max="1"></div>
                 </div>
             </div>
-            <button class="btn btn-primary" onclick="registerStudent()"><i class="fas fa-save"></i> Register Student</button>
+            <button class="btn btn-primary" onclick="registerStudent()"><i class="fas fa-save"></i> Register Student (Auto-Feeds to Woreda & School)</button>
         </div>
         <div class="card">
-            <div class="card-title"><i class="fas fa-table-list"></i> Student Roster (Kutaa 3-5)</div>
-            <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;"><table class="data-table" id="studentTable"><thead><tr><th>ID</th><th>Name</th><th>Zone</th><th>Woreda</th><th>School</th><th>Grade</th><th>Sex</th><th>English Score</th><th>Afaan Oromoo Score</th><th>English Level</th><th>Actions</th></tr></thead><tbody id="studentTableBody"></tbody></table></div>
+            <div class="card-title"><i class="fas fa-table-list"></i> Registered Students</div>
+            <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;"><table class="data-table" id="studentTable"><thead><tr><th>ID</th><th>Name</th><th>Zone</th><th>Woreda</th><th>School</th><th>Grade</th><th>Sex</th><th>English</th><th>Oromo</th><th>English Level</th><th>Oromo Level</th><th>Actions</th></tr></thead><tbody id="studentTableBody"></tbody></table></div>
         </div>
     </div>
 
-    <!-- ASSESSMENT TOOLS SECTION -->
-    <div id="assessment" class="section">
+    <!-- GROUPING BY GRADE & LEVEL SECTION -->
+    <div id="grouping" class="section">
         <div class="card">
-            <div class="card-title"><i class="fas fa-toolbox"></i> TaRL Assessment Tools Reference</div>
-            <div class="grid-3">
-                <div class="alert alert-info"><strong>📖 English Levels (6 Levels)</strong><br>1_Beginner → 2_Alphabet → 3_Words → 4_Sentence → 5_Story → 6_Computed</div>
-                <div class="alert alert-info"><strong>📖 Afaan Oromoo Levels (6 Levels)</strong><br>1_Beginner → 2_Qubee → 3_Jecha → 4_Keeyyata → 5_Seenessaa → 6_Computed</div>
-                <div class="alert alert-info"><strong>📋 Formulas</strong><br>English Total = Gulantaa Jalqabaa + Arfii + Jechoota + Keeyyata Salphaa + Seenessaa<br>Afaan Oromoo Total = Gulantaa Jalqabaa + Qubee + Jecha + Keeyyata Salphaa + Seenessaa</div>
-            </div>
+            <div class="card-title"><i class="fas fa-layer-group"></i> Grouping by Grade & TaRL Level (Per TaRL Guideline)</div>
+            <div class="form-group"><label>Select Grade</label><select id="groupGradeSelect"><option value="3">Kutaa 3</option><option value="4">Kutaa 4</option><option value="5">Kutaa 5</option></select></div>
+            <button class="btn btn-primary" onclick="updateGrouping()"><i class="fas fa-chart-line"></i> Show Grouping</button>
+            <div id="groupingDisplay" style="margin-top: 20px;"></div>
         </div>
         <div class="card">
-            <div class="card-title"><i class="fas fa-chart-line"></i> Assessment Progress Tracking</div>
-            <div class="grid-2">
-                <div class="chart-container" style="height:250px;"><canvas id="assessmentProgressChart"></canvas></div>
-                <div id="assessmentStats"></div>
-            </div>
+            <div class="card-title"><i class="fas fa-chart-simple"></i> TaRL Level Distribution Summary</div>
+            <div id="levelSummary"></div>
+        </div>
+    </div>
+
+    <!-- WOREDA LEVEL SECTION (Auto-populated from Student Registration) -->
+    <div id="woreda" class="section">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-map-marker-alt"></i> Woreda Level Summary (Auto-Generated from Student Data)</div>
+            <div style="overflow-x: auto;"><table class="data-table" id="woredaTable"><thead><tr><th>Zone</th><th>Woreda</th><th>Phase</th><th>Grade</th><th>Total Students</th><th>English Score</th><th>English %</th><th>Oromo Score</th><th>Oromo %</th></tr></thead><tbody id="woredaTableBody"></tbody>}</div>
+            <div class="alert alert-info" style="margin-top:15px;"><i class="fas fa-info-circle"></i> This data is automatically aggregated from student registrations. When you register a student, the woreda and school level data updates automatically.</div>
+        </div>
+    </div>
+
+    <!-- SCHOOL LEVEL SECTION (Auto-populated from Student Registration) -->
+    <div id="school" class="section">
+        <div class="card">
+            <div class="card-title"><i class="fas fa-school"></i> School Level Summary (Auto-Generated from Student Data)</div>
+            <div style="overflow-x: auto;"><table class="data-table" id="schoolTable"><thead><tr><th>Zone</th><th>Woreda</th><th>School Name</th><th>Grade</th><th>Total Students</th><th>English Score</th><th>English %</th><th>Oromo Score</th><th>Oromo %</th></tr></thead><tbody id="schoolTableBody"></tbody>}</div>
         </div>
     </div>
 
@@ -242,23 +177,10 @@
         <div class="card">
             <div class="card-title"><i class="fas fa-file-pdf"></i> Generate TaRL Report</div>
             <div class="grid-2">
-                <div><div class="form-group"><label>Report Type</label><select id="reportType"><option value="woreda">Woreda Level Summary</option><option value="school">School Level Summary</option><option value="student">Student Roster</option></select></div></div>
+                <div><div class="form-group"><label>Report Type</label><select id="reportType"><option value="woreda">Woreda Level Summary</option><option value="school">School Level Summary</option><option value="student">Student Roster</option><option value="grouping">Grouping by Level</option></select></div></div>
                 <div><div class="form-group"><label>Format</label><select id="reportFormat"><option value="html">HTML Report</option><option value="pdf">PDF Report</option></select></div></div>
             </div>
             <button class="btn btn-primary" onclick="generateTaRLReport()"><i class="fas fa-download"></i> Generate Report</button>
-        </div>
-    </div>
-
-    <!-- IMPORT SECTION -->
-    <div id="import" class="section">
-        <div class="card">
-            <div class="card-title"><i class="fas fa-file-excel"></i> Import Excel Data</div>
-            <div class="upload-area" onclick="document.getElementById('excelFile').click()" style="border:2px dashed #ccc; border-radius:20px; padding:40px; text-align:center; cursor:pointer;"><i class="fas fa-cloud-upload-alt" style="font-size:3rem; color:#2563eb;"></i><p>Click to upload Excel file (.xlsx, .xls, .csv)</p><input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importExcelData(this)"></div>
-            <div id="importPreview"></div>
-        </div>
-        <div class="card">
-            <div class="card-title"><i class="fas fa-database"></i> Load Sample TaRL Data</div>
-            <button class="btn btn-success" onclick="loadSampleData()"><i class="fas fa-chalkboard"></i> Load Sample Data (English & Afaan Oromoo)</button>
         </div>
     </div>
 
@@ -268,60 +190,61 @@
             <div class="card-title"><i class="fas fa-database"></i> Data Management</div>
             <button class="btn btn-secondary" onclick="exportAllData()"><i class="fas fa-download"></i> Export All Data (JSON)</button>
             <button class="btn btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Data</button>
+            <button class="btn btn-success" onclick="loadSampleData()"><i class="fas fa-chalkboard"></i> Load Sample Student Data</button>
         </div>
         <div class="card">
-            <div class="card-title"><i class="fas fa-info-circle"></i> About TaRL Department</div>
-            <p><strong>Teaching at the Right Level (TaRL) - English & Afaan Oromoo</strong><br>
-            Sadarkaa Aanaalee fi Manneen Barnootaa itti Sassaabamu<br>
-            Kutaa 3ffaa, 4ffaa fi 5ffaa<br><br>
-            <strong>English Components (5 parts):</strong><br>
-            1. Gulantaa Jalqabaa (Initial Grade / Baseline)<br>
-            2. Arfii (Alphabet / Letter Recognition)<br>
-            3. Jechoota (Word Recognition / Vocabulary)<br>
-            4. Keeyyata Salphaa (Simple Sentence Reading)<br>
-            5. Seenessaa (Story / Reading Comprehension)<br><br>
-            <strong>Afaan Oromoo Components (5 parts):</strong><br>
-            1. Gulantaa Jalqabaa (Initial Grade)<br>
-            2. Qubee (Alphabet Recognition)<br>
-            3. Jecha (Word Recognition)<br>
-            4. Keeyyata Salphaa (Simple Sentence)<br>
-            5. Seenessaa (Story / Comprehension)</p>
+            <div class="card-title"><i class="fas fa-info-circle"></i> TaRL Guidelines Reference</div>
+            <div class="grid-2">
+                <div><strong>English Levels (6 Levels)</strong><br>
+                    1️⃣ Beginner (0 points)<br>
+                    2️⃣ Alphabet (1 point)<br>
+                    3️⃣ Words (2 points)<br>
+                    4️⃣ Sentence (3 points)<br>
+                    5️⃣ Story (4 points)<br>
+                    6️⃣ Computed (5 points)
+                </div>
+                <div><strong>Afaan Oromoo Levels (6 Levels)</strong><br>
+                    1️⃣ Beginner (0 points)<br>
+                    2️⃣ Qubee (1 point)<br>
+                    3️⃣ Jecha (2 points)<br>
+                    4️⃣ Keeyyata (3 points)<br>
+                    5️⃣ Seenessaa (4 points)<br>
+                    6️⃣ Computed (5 points)
+                </div>
+            </div>
+            <div class="formula-box" style="margin-top:15px;"><strong>Formula:</strong> English Total = Beginners + Arfii + Jechoota + Keeyyata Salphaa + Seenessaa (Max 5)<br>
+            <strong>Formula:</strong> Afaan Oromoo Total = Beginners + Qubee + Jecha + Keeyyata Salphaa + Seenessaa (Max 5)</div>
         </div>
     </div>
-    <div class="footer"><p>TaRL Department | English & Afaan Oromoo | 5 Components Each | Baseline · Midline · Endline</p></div>
+    <div class="footer"><p>TaRL Department | Student Registration Auto-Feeds to Woreda & School Levels | Grouping by Grade & Level per TaRL Guideline</p></div>
 </div>
 
 <script>
     // Data Structures
-    let woredaData = [];
-    let schoolData = [];
     let students = [];
 
     function saveData() {
-        localStorage.setItem('tarl_woreda', JSON.stringify(woredaData));
-        localStorage.setItem('tarl_school', JSON.stringify(schoolData));
         localStorage.setItem('tarl_students', JSON.stringify(students));
     }
 
     function loadData() {
-        woredaData = JSON.parse(localStorage.getItem('tarl_woreda') || '[]');
-        schoolData = JSON.parse(localStorage.getItem('tarl_school') || '[]');
         students = JSON.parse(localStorage.getItem('tarl_students') || '[]');
         updateAll();
     }
 
     function updateAll() {
         updateStats();
+        updateStudentTable();
         updateWoredaTable();
         updateSchoolTable();
-        updateStudentTable();
-        updateCharts();
+        updateDashboardCharts();
         updateProgramSummary();
+        updateGrouping();
     }
 
     function updateStats() {
         document.getElementById('totalStudents').textContent = students.length;
-        const uniqueSchools = [...new Set(schoolData.map(s => s.schoolName))];
+        const uniqueSchools = [...new Set(students.map(s => s.schoolName))];
         document.getElementById('totalSchools').textContent = uniqueSchools.length;
         let engTotal = 0, oromoTotal = 0;
         students.forEach(s => { engTotal += s.englishScore || 0; oromoTotal += s.oromoScore || 0; });
@@ -329,63 +252,44 @@
         document.getElementById('avgOromo').textContent = students.length ? ((oromoTotal / (students.length * 5)) * 100).toFixed(0) : '0';
     }
 
-    function addWoredaData() {
-        const engTotal = (parseInt(document.getElementById('woredaEngInitial').value)||0) + (parseInt(document.getElementById('woredaEngAlphabet').value)||0) + 
-                         (parseInt(document.getElementById('woredaEngWords').value)||0) + (parseInt(document.getElementById('woredaEngSentence').value)||0) + 
-                         (parseInt(document.getElementById('woredaEngStory').value)||0);
-        const litTotal = (parseInt(document.getElementById('woredaLitInitial').value)||0) + (parseInt(document.getElementById('woredaLitQubee').value)||0) + 
-                         (parseInt(document.getElementById('woredaLitWord').value)||0) + (parseInt(document.getElementById('woredaLitSentence').value)||0) + 
-                         (parseInt(document.getElementById('woredaLitStory').value)||0);
-        const data = {
-            id: 'WRD_' + Date.now(),
-            zone: document.getElementById('woredaZone').value,
-            woreda: document.getElementById('woredaName').value,
-            schools: parseInt(document.getElementById('woredaSchools').value) || 0,
-            phase: document.getElementById('woredaPhase').value,
-            grade: document.getElementById('woredaGrade').value,
-            totalStudents: parseInt(document.getElementById('woredaTotalStudents').value) || 0,
-            english: { initial: parseInt(document.getElementById('woredaEngInitial').value)||0, alphabet: parseInt(document.getElementById('woredaEngAlphabet').value)||0, words: parseInt(document.getElementById('woredaEngWords').value)||0, sentence: parseInt(document.getElementById('woredaEngSentence').value)||0, story: parseInt(document.getElementById('woredaEngStory').value)||0, total: engTotal },
-            oromo: { initial: parseInt(document.getElementById('woredaLitInitial').value)||0, qubee: parseInt(document.getElementById('woredaLitQubee').value)||0, word: parseInt(document.getElementById('woredaLitWord').value)||0, sentence: parseInt(document.getElementById('woredaLitSentence').value)||0, story: parseInt(document.getElementById('woredaLitStory').value)||0, total: litTotal }
-        };
-        woredaData.push(data);
-        saveData(); updateAll(); alert('Woreda data saved!');
+    function getEnglishLevel(score) {
+        if(score === 0) return { name: 'Beginner', class: 'level-1', code: 1 };
+        if(score === 1) return { name: 'Alphabet', class: 'level-2', code: 2 };
+        if(score === 2) return { name: 'Words', class: 'level-3', code: 3 };
+        if(score === 3) return { name: 'Sentence', class: 'level-4', code: 4 };
+        if(score === 4) return { name: 'Story', class: 'level-5', code: 5 };
+        return { name: 'Computed', class: 'level-6', code: 6 };
     }
 
-    function addSchoolData() {
-        const engTotal = (parseInt(document.getElementById('schoolEngInitial').value)||0) + (parseInt(document.getElementById('schoolEngAlphabet').value)||0) + 
-                         (parseInt(document.getElementById('schoolEngWords').value)||0) + (parseInt(document.getElementById('schoolEngSentence').value)||0) + 
-                         (parseInt(document.getElementById('schoolEngStory').value)||0);
-        const litTotal = (parseInt(document.getElementById('schoolLitInitial').value)||0) + (parseInt(document.getElementById('schoolLitQubee').value)||0) + 
-                         (parseInt(document.getElementById('schoolLitWord').value)||0) + (parseInt(document.getElementById('schoolLitSentence').value)||0) + 
-                         (parseInt(document.getElementById('schoolLitStory').value)||0);
-        const data = {
-            id: 'SCH_' + Date.now(),
-            zone: document.getElementById('schoolZone').value,
-            woreda: document.getElementById('schoolWoreda').value,
-            schoolId: document.getElementById('schoolId').value,
-            schoolName: document.getElementById('schoolName').value,
-            grade: document.getElementById('schoolGrade').value,
-            phase: document.getElementById('schoolPhase').value,
-            english: { initial: parseInt(document.getElementById('schoolEngInitial').value)||0, alphabet: parseInt(document.getElementById('schoolEngAlphabet').value)||0, words: parseInt(document.getElementById('schoolEngWords').value)||0, sentence: parseInt(document.getElementById('schoolEngSentence').value)||0, story: parseInt(document.getElementById('schoolEngStory').value)||0, total: engTotal },
-            oromo: { initial: parseInt(document.getElementById('schoolLitInitial').value)||0, qubee: parseInt(document.getElementById('schoolLitQubee').value)||0, word: parseInt(document.getElementById('schoolLitWord').value)||0, sentence: parseInt(document.getElementById('schoolLitSentence').value)||0, story: parseInt(document.getElementById('schoolLitStory').value)||0, total: litTotal }
-        };
-        schoolData.push(data);
-        saveData(); updateAll(); alert('School data saved!');
+    function getOromoLevel(score) {
+        if(score === 0) return { name: 'Beginner', class: 'level-1', code: 1 };
+        if(score === 1) return { name: 'Qubee', class: 'level-2', code: 2 };
+        if(score === 2) return { name: 'Jecha', class: 'level-3', code: 3 };
+        if(score === 3) return { name: 'Keeyyata', class: 'level-4', code: 4 };
+        if(score === 4) return { name: 'Seenessaa', class: 'level-5', code: 5 };
+        return { name: 'Computed', class: 'level-6', code: 6 };
     }
 
     function registerStudent() {
         const learnerId = 'LRN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4).toUpperCase();
         document.getElementById('learnerId').value = learnerId;
-        const englishScore = (parseInt(document.getElementById('studentEngInitial').value)||0) + (parseInt(document.getElementById('studentEngAlphabet').value)||0) + 
-                             (parseInt(document.getElementById('studentEngWords').value)||0) + (parseInt(document.getElementById('studentEngSentence').value)||0) + 
+        
+        const englishScore = (parseInt(document.getElementById('studentEngBeginners').value)||0) + 
+                             (parseInt(document.getElementById('studentEngAlphabet').value)||0) + 
+                             (parseInt(document.getElementById('studentEngWords').value)||0) + 
+                             (parseInt(document.getElementById('studentEngSentence').value)||0) + 
                              (parseInt(document.getElementById('studentEngStory').value)||0);
-        const oromoScore = (parseInt(document.getElementById('studentLitInitial').value)||0) + (parseInt(document.getElementById('studentLitQubee').value)||0) + 
-                           (parseInt(document.getElementById('studentLitWord').value)||0) + (parseInt(document.getElementById('studentLitSentence').value)||0) + 
-                           (parseInt(document.getElementById('studentLitStory').value)||0);
+        
+        const oromoScore = (parseInt(document.getElementById('studentOromoBeginners').value)||0) + 
+                           (parseInt(document.getElementById('studentOromoQubee').value)||0) + 
+                           (parseInt(document.getElementById('studentOromoWord').value)||0) + 
+                           (parseInt(document.getElementById('studentOromoSentence').value)||0) + 
+                           (parseInt(document.getElementById('studentOromoStory').value)||0);
+        
         const englishLevel = getEnglishLevel(englishScore);
         const oromoLevel = getOromoLevel(oromoScore);
         
-        students.push({
+        const newStudent = {
             id: learnerId,
             zone: document.getElementById('studentZone').value,
             woreda: document.getElementById('studentWoreda').value,
@@ -398,101 +302,206 @@
             englishScore: englishScore,
             oromoScore: oromoScore,
             englishLevel: englishLevel,
-            oromoLevel: oromoLevel
-        });
-        saveData(); updateAll(); alert(`Student registered! ID: ${learnerId}`);
+            oromoLevel: oromoLevel,
+            engComponents: {
+                beginners: parseInt(document.getElementById('studentEngBeginners').value)||0,
+                alphabet: parseInt(document.getElementById('studentEngAlphabet').value)||0,
+                words: parseInt(document.getElementById('studentEngWords').value)||0,
+                sentence: parseInt(document.getElementById('studentEngSentence').value)||0,
+                story: parseInt(document.getElementById('studentEngStory').value)||0
+            },
+            oromoComponents: {
+                beginners: parseInt(document.getElementById('studentOromoBeginners').value)||0,
+                qubee: parseInt(document.getElementById('studentOromoQubee').value)||0,
+                word: parseInt(document.getElementById('studentOromoWord').value)||0,
+                sentence: parseInt(document.getElementById('studentOromoSentence').value)||0,
+                story: parseInt(document.getElementById('studentOromoStory').value)||0
+            }
+        };
+        
+        students.push(newStudent);
+        saveData();
+        updateAll();
+        alert(`Student registered! ID: ${learnerId}\n\nEnglish Score: ${englishScore}/5 (${englishLevel.name})\nAfaan Oromoo Score: ${oromoScore}/5 (${oromoLevel.name})`);
+        clearStudentForm();
     }
 
-    function getEnglishLevel(score) {
-        if(score === 0) return { level: 'Beginner', class: 'level-1', text: '1_Beginner' };
-        if(score === 1) return { level: 'Alphabet', class: 'level-2', text: '2_Alphabet' };
-        if(score === 2) return { level: 'Words', class: 'level-3', text: '3_Words' };
-        if(score === 3) return { level: 'Sentence', class: 'level-4', text: '4_Sentence' };
-        if(score === 4) return { level: 'Story', class: 'level-5', text: '5_Story' };
-        return { level: 'Computed', class: 'level-1', text: '6_Computed' };
-    }
-
-    function getOromoLevel(score) {
-        if(score === 0) return { level: 'Beginner', class: 'level-1', text: '1_Beginner' };
-        if(score === 1) return { level: 'Qubee', class: 'level-2', text: '2_Qubee' };
-        if(score === 2) return { level: 'Jecha', class: 'level-3', text: '3_Jecha' };
-        if(score === 3) return { level: 'Keeyyata', class: 'level-4', text: '4_Keeyyata' };
-        if(score === 4) return { level: 'Seenessaa', class: 'level-5', text: '5_Seenessaa' };
-        return { level: 'Computed', class: 'level-1', text: '6_Computed' };
-    }
-
-    function updateWoredaTable() {
-        const tbody = document.getElementById('woredaTableBody');
-        if(woredaData.length === 0) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">No woreda data. Add above.</td></tr>'; return; }
-        tbody.innerHTML = '';
-        woredaData.forEach(w => {
-            tbody.innerHTML += `<tr>
-                <td>${escapeHtml(w.zone)}</td>
-                <td>${escapeHtml(w.woreda)}</td>
-                <td>${w.schools}</td>
-                <td>${w.phase}</td>
-                <td>Kutaa ${w.grade}</td>
-                <td>${w.totalStudents}</td>
-                <td>${w.english.total} / 5 (${((w.english.total/5)*100).toFixed(0)}%)</td>
-                <td>${w.oromo.total} / 5 (${((w.oromo.total/5)*100).toFixed(0)}%)</td>
-                <td><button class="btn btn-danger btn-sm" onclick="deleteWoreda('${w.id}')"><i class="fas fa-trash"></i></button></td>
-            </tr>`;
-        });
-    }
-
-    function updateSchoolTable() {
-        const tbody = document.getElementById('schoolTableBody');
-        if(schoolData.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No school data. Add above.</td></tr>'; return; }
-        tbody.innerHTML = '';
-        schoolData.forEach(s => {
-            tbody.innerHTML += `<tr>
-                <td>${escapeHtml(s.zone)}</td>
-                <td>${escapeHtml(s.woreda)}</td>
-                <td>${escapeHtml(s.schoolName)}</td>
-                <td>Kutaa ${s.grade}</td>
-                <td>${s.phase}</td>
-                <td>${s.english.total} / 5 (${((s.english.total/5)*100).toFixed(0)}%)</td>
-                <td>${s.oromo.total} / 5 (${((s.oromo.total/5)*100).toFixed(0)}%)</td>
-                <td><button class="btn btn-danger btn-sm" onclick="deleteSchool('${s.id}')"><i class="fas fa-trash"></i></button></td>
-            </tr>`;
-        });
+    function clearStudentForm() {
+        ['studentZone','studentWoreda','studentSchoolId','studentSchoolName','studentName',
+         'studentEngBeginners','studentEngAlphabet','studentEngWords','studentEngSentence','studentEngStory',
+         'studentOromoBeginners','studentOromoQubee','studentOromoWord','studentOromoSentence','studentOromoStory',
+         'learnerId'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
     }
 
     function updateStudentTable() {
         const tbody = document.getElementById('studentTableBody');
-        if(students.length === 0) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">No students registered. Add above.</td></tr>'; return; }
+        if(students.length === 0) { tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;">No students registered. Add above.</td></tr>'; return; }
         tbody.innerHTML = '';
         students.forEach(s => {
             tbody.innerHTML += `<tr>
-                <td>${s.id.substring(0,12)}</td>
-                <td>${escapeHtml(s.name)}</td>
-                <td>${escapeHtml(s.zone)}</td>
-                <td>${escapeHtml(s.woreda)}</td>
-                <td>${escapeHtml(s.schoolName)}</td>
-                <td>Kutaa ${s.grade}</td>
+                <td>${s.id.substring(0,12)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.zone)}</td>
+                <td>${escapeHtml(s.woreda)}</td><td>${escapeHtml(s.schoolName)}</td><td>Kutaa ${s.grade}</td>
                 <td>${s.sex === 'M' ? 'Dhiirra' : 'Dubartii'}</td>
-                <td>${s.englishScore}/5 (${((s.englishScore/5)*100).toFixed(0)}%)</td>
-                <td>${s.oromoScore}/5 (${((s.oromoScore/5)*100).toFixed(0)}%)</td>
-                <td><span class="literacy-level ${s.englishLevel.class}">${s.englishLevel.text}</span></td>
+                <td>${s.englishScore}/5 <span class="level-badge ${s.englishLevel.class}">${s.englishLevel.name}</span></td>
+                <td>${s.oromoScore}/5 <span class="level-badge ${s.oromoLevel.class}">${s.oromoLevel.name}</span></td>
+                <td><span class="level-badge ${s.englishLevel.class}">${s.englishLevel.name}</span></td>
+                <td><span class="level-badge ${s.oromoLevel.class}">${s.oromoLevel.name}</span></td>
                 <td><button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.id}')"><i class="fas fa-trash"></i></button></td>
             </tr>`;
         });
     }
 
-    function updateCharts() {
-        const phases = ['baseline', 'midline', 'endline'];
-        const engData = phases.map(p => schoolData.filter(s => s.phase === p).reduce((sum, s) => sum + s.english.total, 0) / (schoolData.filter(s => s.phase === p).length || 1) * 20);
-        const oromoData = phases.map(p => schoolData.filter(s => s.phase === p).reduce((sum, s) => sum + s.oromo.total, 0) / (schoolData.filter(s => s.phase === p).length || 1) * 20);
-        if(window.engChart) window.engChart.destroy();
-        window.engChart = new Chart(document.getElementById('englishChart'), { type: 'line', data: { labels: ['Baseline', 'Midline', 'Endline'], datasets: [{ label: 'English (%)', data: engData, borderColor: '#3b82f6', fill: true }] } });
-        if(window.oromoChart) window.oromoChart.destroy();
-        window.oromoChart = new Chart(document.getElementById('oromoChart'), { type: 'line', data: { labels: ['Baseline', 'Midline', 'Endline'], datasets: [{ label: 'Afaan Oromoo (%)', data: oromoData, borderColor: '#10b981', fill: true }] } });
+    function updateWoredaTable() {
+        const tbody = document.getElementById('woredaTableBody');
+        const woredaMap = new Map();
         
-        const grade3 = students.filter(s => s.grade === '3').length;
-        const grade4 = students.filter(s => s.grade === '4').length;
-        const grade5 = students.filter(s => s.grade === '5').length;
-        if(window.gradeChart) window.gradeChart.destroy();
-        window.gradeChart = new Chart(document.getElementById('gradePerformanceChart'), { type: 'bar', data: { labels: ['Kutaa 3', 'Kutaa 4', 'Kutaa 5'], datasets: [{ label: 'Number of Students', data: [grade3, grade4, grade5], backgroundColor: '#7c3aed' }] } });
+        students.forEach(s => {
+            const key = `${s.zone}|${s.woreda}|${s.grade}`;
+            if(!woredaMap.has(key)) {
+                woredaMap.set(key, { zone: s.zone, woreda: s.woreda, grade: s.grade, phase: 'baseline', count: 0, engTotal: 0, oromoTotal: 0 });
+            }
+            const data = woredaMap.get(key);
+            data.count++;
+            data.engTotal += s.englishScore;
+            data.oromoTotal += s.oromoScore;
+        });
+        
+        if(woredaMap.size === 0) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">No data - Register students first.</td></tr>'; return; }
+        tbody.innerHTML = '';
+        for(let data of woredaMap.values()) {
+            const engPercent = (data.engTotal / (data.count * 5)) * 100;
+            const oromoPercent = (data.oromoTotal / (data.count * 5)) * 100;
+            tbody.innerHTML += `<tr>
+                <td>${escapeHtml(data.zone)}</td><td>${escapeHtml(data.woreda)}</td><td>${data.phase}</td>
+                <td>Kutaa ${data.grade}</td><td>${data.count}</td>
+                <td>${data.engTotal}/${data.count*5}</td><td>${engPercent.toFixed(1)}%</td>
+                <td>${data.oromoTotal}/${data.count*5}</td><td>${oromoPercent.toFixed(1)}%</td>
+            </tr>`;
+        }
+    }
+
+    function updateSchoolTable() {
+        const tbody = document.getElementById('schoolTableBody');
+        const schoolMap = new Map();
+        
+        students.forEach(s => {
+            const key = `${s.zone}|${s.woreda}|${s.schoolName}|${s.grade}`;
+            if(!schoolMap.has(key)) {
+                schoolMap.set(key, { zone: s.zone, woreda: s.woreda, schoolName: s.schoolName, grade: s.grade, count: 0, engTotal: 0, oromoTotal: 0 });
+            }
+            const data = schoolMap.get(key);
+            data.count++;
+            data.engTotal += s.englishScore;
+            data.oromoTotal += s.oromoScore;
+        });
+        
+        if(schoolMap.size === 0) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">No data - Register students first.</td></tr>'; return; }
+        tbody.innerHTML = '';
+        for(let data of schoolMap.values()) {
+            const engPercent = (data.engTotal / (data.count * 5)) * 100;
+            const oromoPercent = (data.oromoTotal / (data.count * 5)) * 100;
+            tbody.innerHTML += `<tr>
+                <td>${escapeHtml(data.zone)}</td>
+                <td>${escapeHtml(data.woreda)}</td>
+                <td>${escapeHtml(data.schoolName)}</td>
+                <td>Kutaa ${data.grade}</td>
+                <td>${data.count}</td>
+                <td>${data.engTotal}/${data.count*5}</td>
+                <td>${engPercent.toFixed(1)}%</td>
+                <td>${data.oromoTotal}/${data.count*5}</td>
+                <td>${oromoPercent.toFixed(1)}%</td>
+            </tr>`;
+        }
+    }
+
+    function updateGrouping() {
+        const selectedGrade = document.getElementById('groupGradeSelect').value;
+        const gradeStudents = students.filter(s => s.grade === selectedGrade);
+        const container = document.getElementById('groupingDisplay');
+        
+        if(gradeStudents.length === 0) {
+            container.innerHTML = `<div class="alert alert-info">No students registered for Kutaa ${selectedGrade}</div>`;
+            return;
+        }
+        
+        // Group by English Level
+        const englishGroups = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+        const oromoGroups = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+        
+        gradeStudents.forEach(s => {
+            englishGroups[s.englishLevel.code].push(s);
+            oromoGroups[s.oromoLevel.code].push(s);
+        });
+        
+        const levelNames = { 1: 'Beginner', 2: 'Alphabet/Qubee', 3: 'Words/Jecha', 4: 'Sentence/Keeyyata', 5: 'Story/Seenessaa', 6: 'Computed' };
+        
+        let html = `<div class="grid-2"><div><h4><i class="fas fa-language"></i> English Grouping (Kutaa ${selectedGrade})</h4>`;
+        for(let i=1; i<=6; i++) {
+            if(englishGroups[i].length > 0) {
+                html += `<div class="group-card"><strong>Level ${i}: ${levelNames[i]}</strong> (${englishGroups[i].length} students)<br>`;
+                html += `<small>Students: ${englishGroups[i].map(s => s.name).join(', ')}</small></div>`;
+            }
+        }
+        html += `</div><div><h4><i class="fas fa-book"></i> Afaan Oromoo Grouping (Kutaa ${selectedGrade})</h4>`;
+        for(let i=1; i<=6; i++) {
+            if(oromoGroups[i].length > 0) {
+                html += `<div class="group-card"><strong>Level ${i}: ${levelNames[i]}</strong> (${oromoGroups[i].length} students)<br>`;
+                html += `<small>Students: ${oromoGroups[i].map(s => s.name).join(', ')}</small></div>`;
+            }
+        }
+        html += `</div></div>`;
+        container.innerHTML = html;
+        
+        // Update level summary
+        const levelSummary = document.getElementById('levelSummary');
+        let engLevelCount = {1:0,2:0,3:0,4:0,5:0,6:0};
+        let oromoLevelCount = {1:0,2:0,3:0,4:0,5:0,6:0};
+        students.forEach(s => {
+            engLevelCount[s.englishLevel.code]++;
+            oromoLevelCount[s.oromoLevel.code]++;
+        });
+        levelSummary.innerHTML = `<div class="grid-2">
+            <div class="alert alert-info"><strong>📊 English Level Distribution</strong><br>
+            Beginner: ${engLevelCount[1]} | Alphabet: ${engLevelCount[2]} | Words: ${engLevelCount[3]}<br>
+            Sentence: ${engLevelCount[4]} | Story: ${engLevelCount[5]} | Computed: ${engLevelCount[6]}
+            </div>
+            <div class="alert alert-success"><strong>📊 Afaan Oromoo Level Distribution</strong><br>
+            Beginner: ${oromoLevelCount[1]} | Qubee: ${oromoLevelCount[2]} | Jecha: ${oromoLevelCount[3]}<br>
+            Keeyyata: ${oromoLevelCount[4]} | Seenessaa: ${oromoLevelCount[5]} | Computed: ${oromoLevelCount[6]}
+            </div>
+        </div>`;
+    }
+
+    function updateDashboardCharts() {
+        const grades = ['3', '4', '5'];
+        const engData = grades.map(g => {
+            const gradeStudents = students.filter(s => s.grade === g);
+            if(gradeStudents.length === 0) return 0;
+            const total = gradeStudents.reduce((sum, s) => sum + s.englishScore, 0);
+            return (total / (gradeStudents.length * 5)) * 100;
+        });
+        const oromoData = grades.map(g => {
+            const gradeStudents = students.filter(s => s.grade === g);
+            if(gradeStudents.length === 0) return 0;
+            const total = gradeStudents.reduce((sum, s) => sum + s.oromoScore, 0);
+            return (total / (gradeStudents.length * 5)) * 100;
+        });
+        
+        if(window.engGradeChart) window.engGradeChart.destroy();
+        window.engGradeChart = new Chart(document.getElementById('englishGradeChart'), { 
+            type: 'bar', data: { labels: ['Kutaa 3', 'Kutaa 4', 'Kutaa 5'], datasets: [{ label: 'English (%)', data: engData, backgroundColor: '#3b82f6' }] } 
+        });
+        if(window.oromoGradeChart) window.oromoGradeChart.destroy();
+        window.oromoGradeChart = new Chart(document.getElementById('oromoGradeChart'), { 
+            type: 'bar', data: { labels: ['Kutaa 3', 'Kutaa 4', 'Kutaa 5'], datasets: [{ label: 'Afaan Oromoo (%)', data: oromoData, backgroundColor: '#10b981' }] } 
+        });
+        
+        const levelCounts = [0,0,0,0,0,0];
+        students.forEach(s => { levelCounts[s.englishLevel.code-1]++; });
+        if(window.levelChart) window.levelChart.destroy();
+        window.levelChart = new Chart(document.getElementById('levelDistributionChart'), { 
+            type: 'pie', data: { labels: ['Beginner', 'Alphabet', 'Words', 'Sentence', 'Story', 'Computed'], datasets: [{ data: levelCounts, backgroundColor: ['#ef4444','#f59e0b','#fef3c7','#d1fae5','#dbeafe','#e0e7ff'] }] } 
+        });
     }
 
     function updateProgramSummary() {
@@ -502,64 +511,85 @@
         const cwd = students.filter(s => s.specialNeeds !== 'None').length;
         const avgEng = total ? (students.reduce((s, st) => s + st.englishScore, 0) / total) * 20 : 0;
         const avgOromo = total ? (students.reduce((s, st) => s + st.oromoScore, 0) / total) * 20 : 0;
-        document.getElementById('programSummary').innerHTML = `<div class="grid-3"><div class="alert alert-info"><strong>📊 Enrollment Summary</strong><br>Total: ${total}<br>Male: ${males}<br>Female: ${females}<br>CWD: ${cwd}</div><div class="alert alert-success"><strong>📈 Average Scores</strong><br>English: ${avgEng.toFixed(1)}%<br>Afaan Oromoo: ${avgOromo.toFixed(1)}%</div><div class="alert alert-info"><strong>🏫 Coverage</strong><br>Woredas: ${[...new Set(woredaData.map(w=>w.woreda))].length}<br>Schools: ${[...new Set(schoolData.map(s=>s.schoolName))].length}</div></div>`;
+        document.getElementById('programSummary').innerHTML = `<div class="grid-3">
+            <div class="alert alert-info"><strong>📊 Enrollment Summary</strong><br>Total: ${total}<br>Male: ${males}<br>Female: ${females}<br>CWD: ${cwd}</div>
+            <div class="alert alert-success"><strong>📈 Average Scores</strong><br>English: ${avgEng.toFixed(1)}%<br>Afaan Oromoo: ${avgOromo.toFixed(1)}%</div>
+            <div class="alert alert-info"><strong>🏫 Coverage</strong><br>Woredas: ${[...new Set(students.map(s=>s.woreda))].length}<br>Schools: ${[...new Set(students.map(s=>s.schoolName))].length}</div>
+        </div>`;
     }
 
-    function deleteWoreda(id) { if(confirm('Delete woreda data?')) { woredaData = woredaData.filter(w => w.id !== id); saveData(); updateAll(); } }
-    function deleteSchool(id) { if(confirm('Delete school data?')) { schoolData = schoolData.filter(s => s.id !== id); saveData(); updateAll(); } }
-    function deleteStudent(id) { if(confirm('Delete student?')) { students = students.filter(s => s.id !== id); saveData(); updateAll(); } }
+    function deleteStudent(id) { if(confirm('Delete student? This will update woreda/school reports.')) { students = students.filter(s => s.id !== id); saveData(); updateAll(); } }
 
     function generateTaRLReport() {
         const type = document.getElementById('reportType').value;
         const format = document.getElementById('reportFormat').value;
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaRL Program Report</title><style>body{font-family:Arial;margin:40px;}h1{color:#2563eb;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:8px;}</style></head><body><h1>📊 TaRL Program Report</h1><p>English & Afaan Oromoo | Generated: ${new Date().toLocaleString()}</p>`;
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaRL Program Report</title><style>body{font-family:Arial;margin:40px;}h1{color:#2563eb;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:8px;}th{background:#f0f0f0;}</style></head><body><h1>📊 TaRL Program Report</h1><p>English & Afaan Oromoo | Generated: ${new Date().toLocaleString()}</p>`;
+        
         if(type === 'woreda') {
-            html += `<h2>Woreda Level Summary</h2><table><th>Zone</th><th>Woreda</th><th>Schools</th><th>English</th><th>Afaan Oromoo</th>`;
-            woredaData.forEach(w => { html += `<tr><td>${w.zone}</td><td>${w.woreda}</td><td>${w.schools}</td><td>${((w.english.total/5)*100).toFixed(0)}%</td><td>${((w.oromo.total/5)*100).toFixed(0)}%</td></tr>`; });
+            const woredaMap = new Map();
+            students.forEach(s => {
+                const key = `${s.zone}|${s.woreda}|${s.grade}`;
+                if(!woredaMap.has(key)) woredaMap.set(key, { zone: s.zone, woreda: s.woreda, grade: s.grade, count: 0, engTotal: 0, oromoTotal: 0 });
+                const d = woredaMap.get(key);
+                d.count++; d.engTotal += s.englishScore; d.oromoTotal += s.oromoScore;
+            });
+            html += `<h2>Woreda Level Summary</h2><table><th>Zone</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Afaan Oromoo %</th>`;
+            for(let d of woredaMap.values()) {
+                html += `<tr><td>${d.zone}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.engTotal/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oromoTotal/(d.count*5))*100).toFixed(1)}%</td></tr>`;
+            }
             html += `</table>`;
         } else if(type === 'school') {
-            html += `<h2>School Level Summary</h2><tr><th>School</th><th>Grade</th><th>English</th><th>Afaan Oromoo</th>`;
-            schoolData.forEach(s => { html += `<tr><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${((s.english.total/5)*100).toFixed(0)}%</td><td>${((s.oromo.total/5)*100).toFixed(0)}%</td></tr>`; });
+            const schoolMap = new Map();
+            students.forEach(s => {
+                const key = `${s.schoolName}|${s.grade}`;
+                if(!schoolMap.has(key)) schoolMap.set(key, { school: s.schoolName, woreda: s.woreda, grade: s.grade, count: 0, engTotal: 0, oromoTotal: 0 });
+                const d = schoolMap.get(key);
+                d.count++; d.engTotal += s.englishScore; d.oromoTotal += s.oromoScore;
+            });
+            html += `<h2>School Level Summary</h2><table><th>School</th><th>Woreda</th><th>Grade</th><th>Students</th><th>English %</th><th>Afaan Oromoo %</th>`;
+            for(let d of schoolMap.values()) {
+                html += `<tr><td>${d.school}</td><td>${d.woreda}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.engTotal/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oromoTotal/(d.count*5))*100).toFixed(1)}%</td></tr>`;
+            }
             html += `</table>`;
+        } else if(type === 'grouping') {
+            html += `<h2>Student Grouping by Level</h2>`;
+            for(let g of ['3','4','5']) {
+                const gradeStudents = students.filter(s => s.grade === g);
+                html += `<h3>Kutaa ${g}</h3>`;
+                for(let lvl=1; lvl<=6; lvl++) {
+                    const levelStudents = gradeStudents.filter(s => s.englishLevel.code === lvl);
+                    if(levelStudents.length > 0) {
+                        html += `<p><strong>Level ${lvl}: ${levelStudents[0].englishLevel.name}</strong> - ${levelStudents.length} students<br><small>${levelStudents.map(s=>s.name).join(', ')}</small></p>`;
+                    }
+                }
+            }
         } else {
-            html += `<h2>Student Roster</h2><tr><th>Name</th><th>Grade</th><th>English Score</th><th>English Level</th><th>Afaan Oromoo Score</th><th>Afaan Oromoo Level</th>`;
-            students.forEach(s => { html += `<tr><td>${s.name}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.englishLevel.text}</td><td>${s.oromoScore}/5</td><td>${s.oromoLevel.text}</td></tr>`; });
+            html += `<h2>Student Roster</h2><tr><th>Name</th><th>School</th><th>Grade</th><th>English Score</th><th>English Level</th><th>Oromo Score</th><th>Oromo Level</th>`;
+            students.forEach(s => {
+                html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.englishLevel.name}</td><td>${s.oromoScore}/5</td><td>${s.oromoLevel.name}</td></tr>`;
+            });
             html += `</table>`;
         }
-        html += `<h3>📐 Formulas Used</h3><p>English Total = Gulantaa Jalqabaa + Arfii + Jechoota + Keeyyata Salphaa + Seenessaa</p><p>Afaan Oromoo Total = Gulantaa Jalqabaa + Qubee + Jecha + Keeyyata Salphaa + Seenessaa</p></body></html>`;
+        html += `<h3>📐 Formulas Used</h3><p>English Total = Beginners + Arfii + Jechoota + Keeyyata Salphaa + Seenessaa (Max 5)</p><p>Afaan Oromoo Total = Beginners + Qubee + Jecha + Keeyyata Salphaa + Seenessaa (Max 5)</p></body></html>`;
+        
         if(format === 'html') { const w=window.open(); w.document.write(html); w.document.close(); }
         else { const div=document.createElement('div'); div.innerHTML=html; document.body.appendChild(div); html2pdf().from(div).set({margin:1}).save(); setTimeout(()=>document.body.removeChild(div),1000); }
     }
 
-    function importExcelData(input) {
-        const file = input.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(sheet);
-            document.getElementById('importPreview').innerHTML = `<div class="alert alert-success">✅ Imported ${json.length} rows.</div>`;
-            saveData(); updateAll();
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
     function loadSampleData() {
-        woredaData = [{ id:'WRD1', zone:'East Wolega', woreda:'Leka Dulecha', schools:12, phase:'baseline', grade:'3', totalStudents:420, english:{total:4}, oromo:{total:4} }];
-        schoolData = [{ id:'SCH1', zone:'East Wolega', woreda:'Leka Dulecha', schoolId:'001', schoolName:"Ka'umsa Primary School", grade:'3', phase:'baseline', english:{total:4}, oromo:{total:4} }];
         students = [
-            { id:'STU1', zone:'East Wolega', woreda:'Leka Dulecha', schoolId:'001', schoolName:"Ka'umsa Primary School", name:'Almaz Tesfaye', sex:'F', grade:'3', specialNeeds:'None', englishScore:4, oromoScore:5, englishLevel:{text:'4_Sentence',class:'level-4'}, oromoLevel:{text:'5_Seenessaa',class:'level-5'} },
-            { id:'STU2', zone:'West Wolega', woreda:'Gimbi', schoolId:'002', schoolName:'Chuta Goch Primary School', name:'Biruk Abebe', sex:'M', grade:'4', specialNeeds:'None', englishScore:3, oromoScore:4, englishLevel:{text:'3_Words',class:'level-3'}, oromoLevel:{text:'4_Keeyyata',class:'level-4'} }
+            { id:'STU1', zone:'East Wolega', woreda:'Leka Dulecha', schoolId:'001', schoolName:"Ka'umsa Primary School", name:'Almaz Tesfaye', sex:'F', grade:'3', specialNeeds:'None', englishScore:1, oromoScore:2, englishLevel:{name:'Alphabet',class:'level-2',code:2}, oromoLevel:{name:'Jecha',class:'level-3',code:3} },
+            { id:'STU2', zone:'East Wolega', woreda:'Leka Dulecha', schoolId:'001', schoolName:"Ka'umsa Primary School", name:'Biruk Abebe', sex:'M', grade:'3', specialNeeds:'None', englishScore:0, oromoScore:1, englishLevel:{name:'Beginner',class:'level-1',code:1}, oromoLevel:{name:'Qubee',class:'level-2',code:2} },
+            { id:'STU3', zone:'West Wolega', woreda:'Gimbi', schoolId:'002', schoolName:'Chuta Goch Primary School', name:'Chaltu Hussen', sex:'F', grade:'4', specialNeeds:'None', englishScore:3, oromoScore:4, englishLevel:{name:'Sentence',class:'level-4',code:4}, oromoLevel:{name:'Keeyyata',class:'level-4',code:4} },
+            { id:'STU4', zone:'West Wolega', woreda:'Gimbi', schoolId:'002', schoolName:'Chuta Goch Primary School', name:'Dawit Getachew', sex:'M', grade:'5', specialNeeds:'Vision', englishScore:4, oromoScore:5, englishLevel:{name:'Story',class:'level-5',code:5}, oromoLevel:{name:'Seenessaa',class:'level-5',code:5} }
         ];
-        saveData(); updateAll(); alert('Sample data loaded!');
+        saveData(); updateAll(); alert('Sample student data loaded! Woreda and School reports auto-generated.');
     }
 
-    function exportAllData() { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify({woredaData,schoolData,students},null,2)],{type:'application/json'})); a.download=`tarl_data.json`; a.click(); }
-    function clearAllData() { if(confirm('Delete ALL TaRL data?')) { localStorage.clear(); woredaData=[]; schoolData=[]; students=[]; updateAll(); alert('All data cleared.'); } }
+    function exportAllData() { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify({students},null,2)],{type:'application/json'})); a.download=`tarl_data.json`; a.click(); }
+    function clearAllData() { if(confirm('Delete ALL TaRL data?')) { localStorage.clear(); students=[]; updateAll(); alert('All data cleared.'); } }
     function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
-    document.querySelectorAll('.nav-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(btn.dataset.section).classList.add('active'); }); });
+    document.querySelectorAll('.nav-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(btn.dataset.section).classList.add('active'); updateGrouping(); }); });
     loadData();
 </script>
 </body>
