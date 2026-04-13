@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaRL Department | Admin Email Approval | Role-Based Access Control</title>
+    <title>TaRL Department | Admin Email Approval | Working Admin Login</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -69,6 +69,7 @@
         @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
         .toast-msg { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 12px; z-index: 1000; animation: slideIn 0.3s ease; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .admin-credentials { background: #d1fae5; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 0.7rem; text-align: center; }
     </style>
 </head>
 <body>
@@ -82,6 +83,11 @@
                     <p>Teaching at the Right Level Management System</p>
                 </div>
                 
+                <div class="admin-credentials">
+                    <strong>🔐 Admin Login Credentials:</strong><br>
+                    Email: <code>admin@tarl.com</code> | Password: <code>admin123</code>
+                </div>
+
                 <div class="role-selector">
                     <div class="role-btn active" data-role="user" onclick="selectLoginRole('user')"><i class="fas fa-user"></i> Data Collector Login</div>
                     <div class="role-btn" data-role="admin" onclick="selectLoginRole('admin')"><i class="fas fa-user-shield"></i> Admin Login</div>
@@ -96,8 +102,8 @@
                 </div>
 
                 <div id="adminLoginForm" style="display:none;">
-                    <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@tarl.com"></div>
-                    <div class="form-group"><label>Admin Password</label><input type="password" id="adminPassword" placeholder="Enter password"></div>
+                    <div class="form-group"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@tarl.com" value="admin@tarl.com"></div>
+                    <div class="form-group"><label>Admin Password</label><input type="password" id="adminPassword" placeholder="admin123" value="admin123"></div>
                     <button class="btn btn-primary" onclick="loginAdmin()" style="width:100%;"><i class="fas fa-user-shield"></i> Login as Admin</button>
                 </div>
 
@@ -167,7 +173,7 @@
         </div>
     </div>
 
-    <!-- USER MAIN APP (Data Collector - Zone/Woreda Restricted) -->
+    <!-- USER MAIN APP -->
     <div id="userApp" style="display:none;">
         <div class="header">
             <div class="logo"><h1><i class="fas fa-chalkboard-user"></i> TaRL Department</h1><p id="userLocationDisplay">Teaching at the Right Level</p></div>
@@ -261,19 +267,18 @@
                 <button class="btn btn-primary" onclick="generateUserReport()"><i class="fas fa-download"></i> Generate Report</button>
             </div>
         </div>
-        <div class="footer"><p>TaRL Department | Data Collectors only see their approved Zone & Woreda | Admin: mohammedscho2023@gmail.com</p></div>
+        <div class="footer"><p>TaRL Department | Data Collectors only see their approved Zone & Woreda</p></div>
     </div>
 </div>
 
 <script>
-    // Data Structures
     let users = [];
     let students = [];
     let currentUser = null;
     let activityLog = [];
     let pendingEmails = [];
 
-    const ADMIN_EMAIL = "mohammedscho2023@gmail.com";
+    const ADMIN_EMAIL = "admin@tarl.com";
     const ADMIN_PASSWORD = "admin123";
 
     function saveData() {
@@ -284,15 +289,35 @@
     }
 
     function loadData() {
-        users = JSON.parse(localStorage.getItem('tarl_users') || '[]');
+        const savedUsers = localStorage.getItem('tarl_users');
+        if(savedUsers) {
+            users = JSON.parse(savedUsers);
+        } else {
+            users = [];
+        }
+        
         students = JSON.parse(localStorage.getItem('tarl_students') || '[]');
         activityLog = JSON.parse(localStorage.getItem('tarl_activity') || '[]');
         pendingEmails = JSON.parse(localStorage.getItem('tarl_pendingEmails') || '[]');
         
-        if(!users.find(u => u.role === 'admin')) {
-            users.push({ id: 'ADMIN_1', name: 'System Administrator', email: ADMIN_EMAIL, password: btoa(ADMIN_PASSWORD), role: 'admin', zone: '', woreda: '', status: 'approved', registeredAt: new Date().toISOString() });
+        // Check if admin exists - if not, create it
+        const adminExists = users.find(u => u.role === 'admin');
+        if(!adminExists) {
+            users.push({
+                id: 'ADMIN_1',
+                name: 'System Administrator',
+                email: ADMIN_EMAIL,
+                password: btoa(ADMIN_PASSWORD),
+                role: 'admin',
+                zone: '',
+                woreda: '',
+                status: 'approved',
+                registeredAt: new Date().toISOString()
+            });
             saveData();
+            console.log("Admin account created!");
         }
+        
         updateAll();
     }
 
@@ -313,55 +338,18 @@
     }
 
     function sendApprovalEmail(user) {
-        const approveLink = `#approve_${user.id}`;
-        const rejectLink = `#reject_${user.id}`;
-        const emailContent = `
-╔══════════════════════════════════════════════════════════════════╗
-║           T a R L   D e p a r t m e n t   -   A d m i n         ║
-╠══════════════════════════════════════════════════════════════════╣
-║  To: ${ADMIN_EMAIL}                                              ║
-║  Subject: NEW USER REGISTRATION - ACTION REQUIRED                ║
-╠══════════════════════════════════════════════════════════════════╣
-║                                                                  ║
-║  A new Data Collector has registered for the TaRL system.        ║
-║                                                                  ║
-║  ┌─────────────────────────────────────────────────────────────┐ ║
-║  │  USER DETAILS:                                              │ ║
-║  │  Name:   ${user.name.padEnd(30)}│ ║
-║  │  Email:  ${user.email.padEnd(30)}│ ║
-║  │  Zone:   ${user.zone.padEnd(30)}│ ║
-║  │  Woreda: ${user.woreda.padEnd(30)}│ ║
-║  │  Role:   Data Collector                                     │ ║
-║  └─────────────────────────────────────────────────────────────┘ ║
-║                                                                  ║
-║  ┌─────────────────────────────────────────────────────────────┐ ║
-║  │  ACTION REQUIRED:                                           │ ║
-║  │                                                             │ ║
-║  │  ✅ APPROVE: Click the button below in Admin Panel          │ ║
-║  │  ❌ REJECT:  Click the reject button in Admin Panel         │ ║
-║  │                                                             │ ║
-║  │  You can also manage this user in the User Management       │ ║
-║  │  section of the Admin Panel.                                │ ║
-║  └─────────────────────────────────────────────────────────────┘ ║
-║                                                                  ║
-║  ┌─────────────────────────────────────────────────────────────┐ ║
-║  │  QUICK LINKS (Click in Admin Panel):                        │ ║
-║  │  • Go to User Management                                     │ ║
-║  │  • Find user: ${user.email}                                  │ ║
-║  │  • Click Approve or Reject                                   │ ║
-║  └─────────────────────────────────────────────────────────────┘ ║
-║                                                                  ║
-║  Regards,                                                        ║
-║  TaRL Department System                                          ║
-║  This is an automated message.                                  ║
-╚══════════════════════════════════════════════════════════════════╝
-        `;
-        
-        pendingEmails.unshift({ userId: user.id, email: user.email, name: user.name, zone: user.zone, woreda: user.woreda, timestamp: new Date().toISOString() });
+        pendingEmails.unshift({ 
+            userId: user.id, 
+            email: user.email, 
+            name: user.name, 
+            zone: user.zone, 
+            woreda: user.woreda, 
+            timestamp: new Date().toISOString() 
+        });
         saveData();
         updateEmailSimulator();
-        logActivity(`Approval email sent to admin for user: ${user.name} (${user.email})`);
-        showToast(`Email sent to ${ADMIN_EMAIL} for approval`);
+        logActivity(`Approval request sent for user: ${user.name} (${user.email})`);
+        showToast(`Registration request sent to admin!`);
     }
 
     function updateEmailSimulator() {
@@ -376,8 +364,8 @@
             html += `
             <div style="background:#0f172a; margin-bottom:15px; padding:12px; border-radius:8px; border-left:4px solid #10b981;">
                 <div><i class="fas fa-envelope"></i> <strong>To: mohammedscho2023@gmail.com</strong></div>
-                <div><i class="fas fa-user"></i> User: ${email.name} (${email.email})</div>
-                <div><i class="fas fa-map-marker-alt"></i> Zone: ${email.zone} | Woreda: ${email.woreda}</div>
+                <div><i class="fas fa-user"></i> User: ${escapeHtml(email.name)} (${escapeHtml(email.email)})</div>
+                <div><i class="fas fa-map-marker-alt"></i> Zone: ${escapeHtml(email.zone)} | Woreda: ${escapeHtml(email.woreda)}</div>
                 <div><i class="fas fa-clock"></i> Requested: ${new Date(email.timestamp).toLocaleString()}</div>
                 <div style="margin-top:10px;">
                     <button class="btn btn-success btn-sm" onclick="quickApprove('${email.userId}')"><i class="fas fa-check"></i> Approve via Email</button>
@@ -394,7 +382,7 @@
             user.status = 'approved';
             pendingEmails = pendingEmails.filter(e => e.userId !== userId);
             saveData();
-            logActivity(`User ${user.name} (${user.email}) was APPROVED via email link`);
+            logActivity(`User ${user.name} (${user.email}) was APPROVED`);
             updateAdminApp();
             updateEmailSimulator();
             showToast(`${user.name} approved successfully!`);
@@ -407,7 +395,7 @@
             users = users.filter(u => u.id !== userId);
             pendingEmails = pendingEmails.filter(e => e.userId !== userId);
             saveData();
-            logActivity(`User ${user?.name} was REJECTED via email link`);
+            logActivity(`User ${user?.name} was REJECTED`);
             updateAdminApp();
             updateEmailSimulator();
             showToast(`${user?.name} rejected.`, 'error');
@@ -443,12 +431,22 @@
         if(password !== confirm) { alert('Passwords do not match'); return; }
         if(users.find(u => u.email === email)) { alert('Email already registered'); return; }
         
-        const newUser = { id: 'USER_' + Date.now(), name, email, password: btoa(password), role: 'data_collector', zone, woreda, status: 'pending', registeredAt: new Date().toISOString() };
+        const newUser = { 
+            id: 'USER_' + Date.now(), 
+            name, 
+            email, 
+            password: btoa(password), 
+            role: 'data_collector', 
+            zone, 
+            woreda, 
+            status: 'pending', 
+            registeredAt: new Date().toISOString() 
+        };
         users.push(newUser);
         saveData();
         logActivity(`New registration request: ${name} (${email}) - Zone: ${zone}, Woreda: ${woreda}`);
         sendApprovalEmail(newUser);
-        alert(`Registration submitted! An approval email has been sent to the admin (${ADMIN_EMAIL}).\n\nYou will be notified when approved.`);
+        alert(`Registration submitted! An approval request has been sent to the admin.\n\nYou will be able to login once approved.`);
         showLoginForm();
         document.getElementById('regName').value = '';
         document.getElementById('regEmail').value = '';
@@ -467,7 +465,7 @@
             logActivity(`${user.name} (${user.zone}/${user.woreda}) logged in`);
             showUserApp();
         } else if(user && user.status === 'pending') {
-            alert('Your account is pending admin approval. Please wait for confirmation email.');
+            alert('Your account is pending admin approval. Please wait.');
         } else {
             alert('Invalid email or password');
         }
@@ -514,8 +512,8 @@
         document.getElementById('userApp').style.display = 'none';
         document.getElementById('userEmail').value = '';
         document.getElementById('userPassword').value = '';
-        document.getElementById('adminEmail').value = '';
-        document.getElementById('adminPassword').value = '';
+        document.getElementById('adminEmail').value = 'admin@tarl.com';
+        document.getElementById('adminPassword').value = 'admin123';
         selectLoginRole('user');
     }
 
@@ -539,24 +537,24 @@
 
     // ADMIN FUNCTIONS
     function updateAdminApp() {
-        const approvedUsers = users.filter(u => u.role === 'data_collector');
-        const pendingUsers = approvedUsers.filter(u => u.status === 'pending');
-        document.getElementById('adminTotalUsers').textContent = approvedUsers.length;
+        const dataCollectors = users.filter(u => u.role === 'data_collector');
+        const pendingUsers = dataCollectors.filter(u => u.status === 'pending');
+        document.getElementById('adminTotalUsers').textContent = dataCollectors.length;
         document.getElementById('adminPendingUsers').textContent = pendingUsers.length;
         document.getElementById('adminTotalStudents').textContent = students.length;
         
-        document.getElementById('adminUserStats').innerHTML = `<div class="alert alert-info">Total Data Collectors: ${approvedUsers.length}<br>Approved: ${approvedUsers.filter(u=>u.status==='approved').length}<br>Pending: ${pendingUsers.length}</div>`;
+        document.getElementById('adminUserStats').innerHTML = `<div class="alert alert-info">Total Data Collectors: ${dataCollectors.length}<br>Approved: ${dataCollectors.filter(u=>u.status==='approved').length}<br>Pending: ${pendingUsers.length}</div>`;
         document.getElementById('adminSchoolStats').innerHTML = `<div class="alert alert-success">Total Students: ${students.length}<br>Schools: ${[...new Set(students.map(s=>s.schoolName))].length}<br>Woredas: ${[...new Set(students.map(s=>s.woreda))].length}</div>`;
         
         const tbody = document.getElementById('adminUsersTableBody');
         tbody.innerHTML = '';
-        users.filter(u => u.role === 'data_collector').forEach(u => {
+        dataCollectors.forEach(u => {
             tbody.innerHTML += `<tr style="${u.status === 'pending' ? 'background:#fef3c7;' : ''}">
                 <td>${escapeHtml(u.name)}</td><td>${escapeHtml(u.email)}</td><td>${escapeHtml(u.zone)}</td><td>${escapeHtml(u.woreda)}</td>
                 <td>Data Collector</td><td>${u.status === 'approved' ? '<span class="level-badge level-4">Approved</span>' : '<span class="level-badge level-2">Pending</span>'}</td>
                 <td>${new Date(u.registeredAt).toLocaleDateString()}</td>
                 <td>${u.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveUser('${u.id}')"><i class="fas fa-check"></i> Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectUser('${u.id}')"><i class="fas fa-times"></i> Reject</button>` : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i> Delete</button>`}</td>
-            </tr>`;
+            <tr>`;
         });
     }
 
@@ -573,7 +571,7 @@
             user.status = 'approved'; 
             pendingEmails = pendingEmails.filter(e => e.userId !== userId);
             saveData(); 
-            logActivity(`User ${user.name} (${user.zone}/${user.woreda}) was APPROVED`); 
+            logActivity(`User ${user.name} was APPROVED`); 
             updateAdminApp(); 
             updateEmailSimulator();
             showToast(`${user.name} approved!`);
@@ -618,7 +616,7 @@
     }
 
     // USER FUNCTIONS
-    function getUserStudents() { return students.filter(s => s.zone === currentUser.zone && s.woreda === currentUser.woreda); }
+    function getUserStudents() { return students.filter(s => s.zone === currentUser?.zone && s.woreda === currentUser?.woreda); }
 
     function registerUserStudent() {
         const learnerId = 'LRN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4).toUpperCase();
@@ -638,7 +636,7 @@
         });
         saveData();
         updateUserApp();
-        showToast(`Student ${document.getElementById('userStudentName').value} registered!`);
+        showToast(`Student registered!`);
         logActivity(`${currentUser.name} registered student: ${document.getElementById('userStudentName').value}`);
         clearUserStudentForm();
     }
@@ -664,7 +662,8 @@
             tbody.innerHTML += `<tr><td>${s.id.substring(0,10)}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.schoolName)}</td><td>Kutaa ${s.grade}</td>
             <td>${s.englishScore}/5 <span class="level-badge ${s.englishLevel.class}">${s.englishLevel.name}</span></td>
             <td>${s.oromoScore}/5 <span class="level-badge ${s.oromoLevel.class}">${s.oromoLevel.name}</span></td>
-            <td><button class="btn btn-danger btn-sm" onclick="deleteUserStudent('${s.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+            <td><button class="btn btn-danger btn-sm" onclick="deleteUserStudent('${s.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
         });
         
         const wMap = new Map();
@@ -727,17 +726,17 @@
             const map = new Map();
             userStudents.forEach(s => { const key = `${s.grade}`; if(!map.has(key)) map.set(key, { grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
             html += `<h2>Woreda Summary</h2><table border="1"><tr><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
-            for(let d of map.values()) html += `<tr><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
-            html += `</table>`;
+            for(let d of map.values()) html += `<tr><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td>`;
+            html += ` licensierad`;
         } else if(type === 'school') {
             const map = new Map();
             userStudents.forEach(s => { const key = `${s.schoolName}|${s.grade}`; if(!map.has(key)) map.set(key, { school:s.schoolName, grade:s.grade, count:0, eng:0, oro:0 }); const d=map.get(key); d.count++; d.eng+=s.englishScore; d.oro+=s.oromoScore; });
             html += `<h2>School Summary</h2><table border="1"><tr><th>School</th><th>Grade</th><th>Students</th><th>English %</th><th>Oromo %</th>`;
-            for(let d of map.values()) html += `<tr><td>${d.school}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td></tr>`;
+            for(let d of map.values()) html += `<tr><td>${d.school}</td><td>Kutaa ${d.grade}</td><td>${d.count}</td><td>${((d.eng/(d.count*5))*100).toFixed(1)}%</td><td>${((d.oro/(d.count*5))*100).toFixed(1)}%</td>`;
             html += `</table>`;
         } else {
             html += `<h2>Student Roster</h2><table border="1"><tr><th>Name</th><th>School</th><th>Grade</th><th>English</th><th>Oromo</th>`;
-            userStudents.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td></tr>`);
+            userStudents.forEach(s => html += `<tr><td>${s.name}</td><td>${s.schoolName}</td><td>Kutaa ${s.grade}</td><td>${s.englishScore}/5</td><td>${s.oromoScore}/5</td>`);
             html += `</table>`;
         }
         html += `</body></html>`;
